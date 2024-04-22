@@ -1,11 +1,11 @@
 package com.app.watch_wise_backend.service;
 
+import com.app.watch_wise_backend.model.User;
 import io.jsonwebtoken.Claims;
 import io.jsonwebtoken.Jwts;
 import io.jsonwebtoken.SignatureAlgorithm;
 import io.jsonwebtoken.security.Keys;
 import org.springframework.beans.factory.annotation.Value;
-import org.springframework.security.core.userdetails.UserDetails;
 import org.springframework.stereotype.Service;
 
 import java.util.Date;
@@ -48,14 +48,14 @@ public class AuthService {
         return extractExpiration(token).before(new Date());
     }
 
-    public String generateToken(UserDetails userDetails) {
+    public String generateToken(User user) {
         Map<String, Object> claims = new HashMap<>();
-        return createToken(claims, userDetails.getUsername(), ACCESS_TOKEN_EXPIRATION);
+        return createToken(claims, user.getUsername(), ACCESS_TOKEN_EXPIRATION);
     }
 
-    public String generateRefreshToken(UserDetails userDetails) {
+    public String generateRefreshToken(User user) {
         Map<String, Object> claims = new HashMap<>();
-        return createToken(claims, userDetails.getUsername(), REFRESH_TOKEN_EXPIRATION);
+        return createToken(claims, user.getUsername(), REFRESH_TOKEN_EXPIRATION);
     }
 
     private String createToken(Map<String, Object> claims, String subject, long expiration) {
@@ -68,8 +68,8 @@ public class AuthService {
                 .compact();
     }
 
-    public Boolean validateToken(String token, UserDetails userDetails) {
+    public Boolean validateToken(String token, User user) {
         final String username = extractUsername(token);
-        return (username.equals(userDetails.getUsername()) && !isTokenExpired(token));
+        return (username.equals(user.getUsername()) && !isTokenExpired(token));
     }
 }
