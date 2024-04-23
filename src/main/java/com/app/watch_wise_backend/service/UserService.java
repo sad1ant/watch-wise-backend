@@ -3,11 +3,13 @@ package com.app.watch_wise_backend.service;
 import com.app.watch_wise_backend.model.Role;
 import com.app.watch_wise_backend.model.User;
 import com.app.watch_wise_backend.repository.UserRepository;
+import jakarta.servlet.http.HttpServletResponse;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.security.core.userdetails.UserDetails;
 import org.springframework.security.crypto.password.PasswordEncoder;
 import org.springframework.stereotype.Service;
 
+import java.util.Collections;
 import java.util.HashMap;
 import java.util.Map;
 
@@ -30,16 +32,12 @@ public class UserService {
         return userRepository.save(user);
     }
 
-    public Map<String, String> loginUser(String username, String password) {
+    public Map<String, String> loginUser(String username, String password, HttpServletResponse response) {
         User user = userRepository.findByUsername(username);
         if (user != null && passwordEncoder.matches(password, user.getPassword())) {
-            String accessToken = authService.generateToken(user);
-            String refreshToken = authService.generateRefreshToken(user);
-            Map<String, String> tokens = new HashMap<>();
-            tokens.put("access_token", accessToken);
-            tokens.put("refresh_token", refreshToken);
-            return tokens;
+            return authService.generateTokensAndSetCookies(user, response);
+        } else {
+            return Collections.singletonMap("error", "Invalid credentials");
         }
-        return null;
     }
 }
