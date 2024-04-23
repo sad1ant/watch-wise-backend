@@ -35,7 +35,7 @@ public class AuthController {
         return new ResponseEntity<>(responseMap, HttpStatus.OK);
     }
 
-    @GetMapping("/refresh")
+    @GetMapping("/auth/refresh")
     public ResponseEntity<?> refresh(@CookieValue(name = "refresh_token", required = false) String refreshToken, HttpServletResponse response) {
         if (refreshToken == null) {
             return new ResponseEntity<>("Refresh token not found", HttpStatus.UNAUTHORIZED);
@@ -53,7 +53,7 @@ public class AuthController {
         return new ResponseEntity<>(tokens, HttpStatus.OK);
     }
 
-    @PostMapping("/logout")
+    @PostMapping("/auth/logout")
     public ResponseEntity<?> logout(HttpServletResponse response) {
         authService.removeAllTokens(response);
         return new ResponseEntity<>(Collections.singletonMap("message", "Logged out successfully"), HttpStatus.OK);

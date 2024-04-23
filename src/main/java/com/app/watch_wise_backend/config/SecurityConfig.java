@@ -1,5 +1,6 @@
 package com.app.watch_wise_backend.config;
 
+import com.app.watch_wise_backend.middleware.AdminMiddleware;
 import com.app.watch_wise_backend.middleware.AuthMiddleware;
 import com.app.watch_wise_backend.repository.UserRepository;
 import com.app.watch_wise_backend.service.AuthService;
@@ -20,7 +21,16 @@ public class SecurityConfig {
     public FilterRegistrationBean<AuthMiddleware> filterRegistration(AuthService authService, UserRepository userRepository) {
         FilterRegistrationBean<AuthMiddleware> registrationBean = new FilterRegistrationBean<>();
         registrationBean.setFilter(new AuthMiddleware(authService, userRepository));
-        registrationBean.addUrlPatterns("/logout");
+        registrationBean.addUrlPatterns("/auth/*");
+        registrationBean.setOrder(1);
+        return registrationBean;
+    }
+
+    @Bean
+    public FilterRegistrationBean<AdminMiddleware> adminFilterRegistration(AuthService authService, UserRepository userRepository) {
+        FilterRegistrationBean<AdminMiddleware> registrationBean = new FilterRegistrationBean<>();
+        registrationBean.setFilter(new AdminMiddleware(authService, userRepository));
+        registrationBean.addUrlPatterns("/admin/*");
         registrationBean.setOrder(1);
         return registrationBean;
     }

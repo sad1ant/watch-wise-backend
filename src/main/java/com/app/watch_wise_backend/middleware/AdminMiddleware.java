@@ -1,5 +1,6 @@
 package com.app.watch_wise_backend.middleware;
 
+import com.app.watch_wise_backend.model.Role;
 import com.app.watch_wise_backend.model.User;
 import com.app.watch_wise_backend.repository.UserRepository;
 import com.app.watch_wise_backend.service.AuthService;
@@ -13,11 +14,11 @@ import org.springframework.web.filter.OncePerRequestFilter;
 
 import java.io.IOException;
 
-public class AuthMiddleware extends OncePerRequestFilter {
+public class AdminMiddleware extends OncePerRequestFilter {
     private final AuthService authService;
     private final UserRepository userRepository;
 
-    public AuthMiddleware(AuthService authService, UserRepository userRepository) {
+    public AdminMiddleware(AuthService authService, UserRepository userRepository) {
         this.authService = authService;
         this.userRepository = userRepository;
     }
@@ -56,9 +57,15 @@ public class AuthMiddleware extends OncePerRequestFilter {
                 response.setStatus(HttpStatus.NOT_FOUND.value());
                 response.setContentType("application/json");
                 response.getWriter().write("{\"error\": \"User not found\"}");
+                return;
             }
 
-            request.setAttribute("user", user);
+            if (!Role.ADMIN.equals(user.getRole())) {
+                response.setStatus(HttpStatus.FORBIDDEN.value());
+                response.setContentType("application/json");
+                response.getWriter().write("{\"error\": \"Forbidden: User is not an admin\"}");
+                return;
+            }
 
             filterChain.doFilter(request, response);
         } catch (Exception e) {
