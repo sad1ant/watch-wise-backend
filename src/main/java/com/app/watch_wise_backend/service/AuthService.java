@@ -1,6 +1,6 @@
 package com.app.watch_wise_backend.service;
 
-import com.app.watch_wise_backend.model.User;
+import com.app.watch_wise_backend.model.user.User;
 import io.jsonwebtoken.Claims;
 import io.jsonwebtoken.Jwts;
 import io.jsonwebtoken.SignatureAlgorithm;

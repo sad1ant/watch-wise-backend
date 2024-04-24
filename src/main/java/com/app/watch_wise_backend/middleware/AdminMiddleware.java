@@ -1,7 +1,7 @@
 package com.app.watch_wise_backend.middleware;
 
-import com.app.watch_wise_backend.model.Role;
-import com.app.watch_wise_backend.model.User;
+import com.app.watch_wise_backend.model.user.Role;
+import com.app.watch_wise_backend.model.user.User;
 import com.app.watch_wise_backend.repository.UserRepository;
 import com.app.watch_wise_backend.service.AuthService;
 import io.jsonwebtoken.Claims;

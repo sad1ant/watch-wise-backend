@@ -1,6 +1,6 @@
 package com.app.watch_wise_backend.controller;
 
-import com.app.watch_wise_backend.model.User;
+import com.app.watch_wise_backend.model.user.User;
 import com.app.watch_wise_backend.repository.UserRepository;
 import com.app.watch_wise_backend.service.AuthService;
 import com.app.watch_wise_backend.service.UserService;

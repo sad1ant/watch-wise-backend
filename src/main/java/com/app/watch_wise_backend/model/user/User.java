@@ -1,7 +1,11 @@
-package com.app.watch_wise_backend.model;
+package com.app.watch_wise_backend.model.user;
 
+import com.app.watch_wise_backend.model.content.UserContentRecommendation;
+import com.app.watch_wise_backend.model.content.UserContentStatus;
 import jakarta.persistence.*;
 import lombok.*;
+
+import java.util.List;
 
 @Data
 @Getter
@@ -30,4 +34,10 @@ public class User {
     @Enumerated(value = EnumType.STRING)
     @Column(name = "role", nullable = false)
     private Role role;
+
+    @OneToMany(mappedBy = "user")
+    private List<UserContentRecommendation> contentRecommendations;
+
+    @OneToMany(mappedBy = "user")
+    private List<UserContentStatus> contentStatus;
 }

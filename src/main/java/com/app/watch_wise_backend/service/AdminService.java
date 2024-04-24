@@ -1,6 +1,6 @@
 package com.app.watch_wise_backend.service;
 
-import com.app.watch_wise_backend.model.User;
+import com.app.watch_wise_backend.model.user.User;
 import com.app.watch_wise_backend.repository.UserRepository;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;

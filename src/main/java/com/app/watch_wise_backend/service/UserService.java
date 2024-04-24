@@ -1,7 +1,7 @@
 package com.app.watch_wise_backend.service;
 
-import com.app.watch_wise_backend.model.Role;
-import com.app.watch_wise_backend.model.User;
+import com.app.watch_wise_backend.model.user.Role;
+import com.app.watch_wise_backend.model.user.User;
 import com.app.watch_wise_backend.repository.UserRepository;
 import jakarta.servlet.http.HttpServletResponse;
 import org.springframework.beans.factory.annotation.Autowired;
