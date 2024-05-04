@@ -5,11 +5,13 @@ import jakarta.persistence.*;
 import lombok.*;
 
 @Data
-@NoArgsConstructor
 @AllArgsConstructor
+@NoArgsConstructor
+@Getter
+@Setter
 @Entity
-@Table(name = "user_content_recommendation")
-public class UserContentRecommendation {
+@Table(name = "user_movie_recommendation")
+public class UserMovieRecommendation {
     @Id
     @GeneratedValue(strategy = GenerationType.IDENTITY)
     private Long id;
@@ -19,6 +21,6 @@ public class UserContentRecommendation {
     private User user;
 
     @ManyToOne
-    @JoinColumn(name = "content_id", nullable = false)
-    private Content content;
+    @JoinColumn(name = "movie_id", nullable = false)
+    private Movie movie;
 }

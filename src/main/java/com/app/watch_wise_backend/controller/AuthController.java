@@ -38,12 +38,12 @@ public class AuthController {
     @GetMapping("/auth/refresh")
     public ResponseEntity<?> refresh(@CookieValue(name = "refresh_token", required = false) String refreshToken, HttpServletResponse response) {
         if (refreshToken == null) {
-            return new ResponseEntity<>("Refresh token not found", HttpStatus.UNAUTHORIZED);
+            return new ResponseEntity<>(Collections.singletonMap("message", "Refresh token not found"), HttpStatus.UNAUTHORIZED);
         }
 
         Claims claims = authService.validateRefreshToken(refreshToken);
         if (claims == null) {
-            return new ResponseEntity<>("Invalid refresh token", HttpStatus.UNAUTHORIZED);
+            return new ResponseEntity<>(Collections.singletonMap("message", "Invalid refresh token"), HttpStatus.UNAUTHORIZED);
         }
 
         String username = (String) claims.get("username");

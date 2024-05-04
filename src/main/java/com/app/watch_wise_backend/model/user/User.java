@@ -1,7 +1,6 @@
 package com.app.watch_wise_backend.model.user;
 
-import com.app.watch_wise_backend.model.content.UserContentRecommendation;
-import com.app.watch_wise_backend.model.content.UserContentStatus;
+import com.app.watch_wise_backend.model.content.*;
 import jakarta.persistence.*;
 import lombok.*;
 
@@ -36,8 +35,17 @@ public class User {
     private Role role;
 
     @OneToMany(mappedBy = "user")
-    private List<UserContentRecommendation> contentRecommendations;
+    private List<UserMovieStatus> movieStatuses;
 
     @OneToMany(mappedBy = "user")
-    private List<UserContentStatus> contentStatus;
+    private List<UserMovieRecommendation> movieRecommendations;
+
+    @OneToMany(mappedBy = "user")
+    private List<UserSeriesStatus> seriesStatuses;
+
+    @OneToMany(mappedBy = "user")
+    private List<UserSeriesRecommendation> seriesRecommendations;
+
+    @OneToMany(mappedBy = "user")
+    private List<UserEpisodeStatus> episodeStatuses;
 }

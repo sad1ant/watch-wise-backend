@@ -5,11 +5,13 @@ import jakarta.persistence.*;
 import lombok.*;
 
 @Data
+@Getter
+@Setter
 @NoArgsConstructor
 @AllArgsConstructor
 @Entity
-@Table(name = "user_content_status")
-public class UserContentStatus {
+@Table(name = "user_episode_status")
+public class UserEpisodeStatus {
     @Id
     @GeneratedValue(strategy = GenerationType.IDENTITY)
     private Long id;
@@ -19,8 +21,8 @@ public class UserContentStatus {
     private User user;
 
     @ManyToOne
-    @JoinColumn(name = "content_id", nullable = false)
-    private Content content;
+    @JoinColumn(name = "episode_id", nullable = false)
+    private Episode episode;
 
     @Enumerated(EnumType.STRING)
     private WatchStatus watchStatus;

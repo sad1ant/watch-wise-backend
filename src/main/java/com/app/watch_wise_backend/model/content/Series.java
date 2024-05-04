@@ -11,18 +11,14 @@ import java.util.List;
 @NoArgsConstructor
 @AllArgsConstructor
 @Entity
-@Table(name = "content")
-public class Content {
+@Table(name = "serieses")
+public class Series {
     @Id
     @GeneratedValue(strategy = GenerationType.IDENTITY)
     private Long id;
 
     @Column(name = "title", nullable = false)
     private String title;
-
-    @Enumerated(EnumType.STRING)
-    @Column(name = "type", nullable = false)
-    private ContentType type;
 
     @Column(name = "release_year", nullable = false)
     private Integer releaseYear;
@@ -63,15 +59,15 @@ public class Content {
     @Column(name = "age_rating", nullable = false)
     private String ageRating;
 
-    @Column(name = "duration", nullable = false)
-    private Integer duration;
-
-    @Column(name = "rating", nullable = false)
+    @Column(name = "rating")
     private Double rating;
 
-    @OneToMany(mappedBy = "content")
-    private List<UserContentRecommendation> contentRecommendations;
+    @OneToMany(mappedBy = "series")
+    private List<Episode> episodes;
 
-    @OneToMany(mappedBy = "content")
-    private List<UserContentStatus> contentStatus;
+    @OneToMany(mappedBy = "series")
+    private List<UserSeriesRecommendation> seriesRecommendations;
+
+    @OneToMany(mappedBy = "series")
+    private List<UserSeriesStatus> seriesStatuses;
 }
