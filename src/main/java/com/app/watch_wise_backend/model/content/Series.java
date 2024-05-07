@@ -1,5 +1,6 @@
 package com.app.watch_wise_backend.model.content;
 
+import com.app.watch_wise_backend.model.diary.UserSeriesDiary;
 import jakarta.persistence.*;
 import lombok.*;
 
@@ -62,12 +63,15 @@ public class Series {
     @Column(name = "rating")
     private Double rating;
 
+    @Column(name = "image", nullable = false)
+    private String image;
+
     @OneToMany(mappedBy = "series")
     private List<Episode> episodes;
 
     @OneToMany(mappedBy = "series")
-    private List<UserSeriesRecommendation> seriesRecommendations;
+    private List<UserSeriesStatus> seriesStatuses;
 
     @OneToMany(mappedBy = "series")
-    private List<UserSeriesStatus> seriesStatuses;
+    private List<UserSeriesDiary> seriesDiary;
 }

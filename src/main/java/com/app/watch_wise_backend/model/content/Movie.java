@@ -1,5 +1,6 @@
 package com.app.watch_wise_backend.model.content;
 
+import com.app.watch_wise_backend.model.diary.UserMovieDiary;
 import jakarta.persistence.*;
 import lombok.*;
 
@@ -64,9 +65,12 @@ public class Movie {
     @Column(name = "rating")
     private Double rating;
 
-    @OneToMany(mappedBy = "movie")
-    private List<UserMovieRecommendation> movieRecommendations;
+    @Column(name = "image", nullable = false)
+    private String image;
 
     @OneToMany(mappedBy = "movie")
     private List<UserMovieStatus> movieStatuses;
+
+    @OneToMany(mappedBy = "movie")
+    private List<UserMovieDiary> movieDiary;
 }

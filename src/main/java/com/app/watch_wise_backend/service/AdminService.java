@@ -14,6 +14,7 @@ import org.springframework.stereotype.Service;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
+import java.util.Optional;
 import java.util.stream.Collectors;
 
 @Service
@@ -66,5 +67,30 @@ public class AdminService {
             }
         }
         return response;
+    }
+
+    public Movie updateMovie(Long movieId, Movie updatedMovie) {
+        Optional<Movie> optionalMovie = movieRepository.findById(movieId);
+        if (optionalMovie.isPresent()) {
+            Movie existingMovie = optionalMovie.get();
+            existingMovie.setTitle(updatedMovie.getTitle());
+            existingMovie.setReleaseYear(updatedMovie.getReleaseYear());
+            existingMovie.setCountry(updatedMovie.getCountry());
+            existingMovie.setGenre(updatedMovie.getGenre());
+            existingMovie.setSlogan(updatedMovie.getSlogan());
+            existingMovie.setDirectors(updatedMovie.getDirectors());
+            existingMovie.setProducers(updatedMovie.getProducers());
+            existingMovie.setWriters(updatedMovie.getWriters());
+            existingMovie.setCinematographers(updatedMovie.getCinematographers());
+            existingMovie.setComposers(updatedMovie.getComposers());
+            existingMovie.setArtists(updatedMovie.getArtists());
+            existingMovie.setEditors(updatedMovie.getEditors());
+            existingMovie.setBudget(updatedMovie.getBudget());
+            existingMovie.setAgeRating(updatedMovie.getAgeRating());
+            existingMovie.setDuration(updatedMovie.getDuration());
+            existingMovie.setImage(updatedMovie.getImage());
+            return movieRepository.save(existingMovie);
+        }
+        return null;
     }
 }

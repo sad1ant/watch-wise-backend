@@ -1,6 +1,7 @@
 package com.app.watch_wise_backend.model.user;
 
 import com.app.watch_wise_backend.model.content.*;
+import com.app.watch_wise_backend.model.diary.*;
 import jakarta.persistence.*;
 import lombok.*;
 
@@ -38,14 +39,14 @@ public class User {
     private List<UserMovieStatus> movieStatuses;
 
     @OneToMany(mappedBy = "user")
-    private List<UserMovieRecommendation> movieRecommendations;
-
-    @OneToMany(mappedBy = "user")
     private List<UserSeriesStatus> seriesStatuses;
 
     @OneToMany(mappedBy = "user")
-    private List<UserSeriesRecommendation> seriesRecommendations;
+    private List<UserEpisodeStatus> episodeStatuses;
 
     @OneToMany(mappedBy = "user")
-    private List<UserEpisodeStatus> episodeStatuses;
+    private List<UserMovieDiary> movieDiary;
+
+    @OneToMany(mappedBy = "user")
+    private List<UserSeriesDiary> seriesDiary;
 }

@@ -1,7 +1,11 @@
 package com.app.watch_wise_backend.model.content;
 
 public enum WatchStatus {
-    NOT_WATCHED,
+    WATCHING,
     WATCHED,
-    WANT_TO_WATCH
+    WANT_TO_WATCH,
+    ABANDONED,
+    RECOMMENDED,
+    REVIEWED,
+    INTERESTED
 }

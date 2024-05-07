@@ -3,8 +3,6 @@ package com.app.watch_wise_backend.model.content;
 import jakarta.persistence.*;
 import lombok.*;
 
-import java.util.List;
-
 @Data
 @Getter
 @Setter
@@ -33,6 +31,6 @@ public class Episode {
     @Column(name = "duration", nullable = false)
     private String duration;
 
-    @OneToMany(mappedBy = "episode")
-    private List<UserEpisodeStatus> episodeStatuses;
+    @Column(name = "image", nullable = false)
+    private String image;
 }

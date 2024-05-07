@@ -46,4 +46,14 @@ public class AdminController {
             return new ResponseEntity<>(Collections.singletonMap("message", "Content type and content must be provided"), HttpStatus.BAD_REQUEST);
         }
     }
+
+    @PutMapping("/update-movie/{movieId}")
+    public ResponseEntity<?> updateMovie(@PathVariable Long movieId, @RequestBody Movie updatedMovie) {
+        Movie updated = adminService.updateMovie(movieId, updatedMovie);
+        if (updated != null) {
+            return new ResponseEntity<>(updated, HttpStatus.OK);
+        } else {
+            return new ResponseEntity<>(Collections.singletonMap("message", "Movie not found with id:" + movieId), HttpStatus.NOT_FOUND);
+        }
+    }
 }
