@@ -1,5 +1,6 @@
 package com.app.watch_wise_backend.controller;
 
+import com.app.watch_wise_backend.model.content.Episode;
 import com.app.watch_wise_backend.model.content.Movie;
 import com.app.watch_wise_backend.model.content.Series;
 import com.app.watch_wise_backend.service.AdminService;
@@ -47,13 +48,43 @@ public class AdminController {
         }
     }
 
+    @PostMapping("/add-episode/{seriesId}")
+    public ResponseEntity<?> addEpisode(@PathVariable Long seriesId, @RequestBody Episode episode) {
+        Map<String, String> response = adminService.addEpisode(seriesId, episode);
+        if (response != null) {
+            return new ResponseEntity<>(response, HttpStatus.OK);
+        } else {
+            return new ResponseEntity<>(Collections.singletonMap("message", "Failed to add episode to series with id: " + seriesId), HttpStatus.NOT_FOUND);
+        }
+    }
+
     @PutMapping("/update-movie/{movieId}")
     public ResponseEntity<?> updateMovie(@PathVariable Long movieId, @RequestBody Movie updatedMovie) {
         Movie updated = adminService.updateMovie(movieId, updatedMovie);
         if (updated != null) {
             return new ResponseEntity<>(updated, HttpStatus.OK);
         } else {
-            return new ResponseEntity<>(Collections.singletonMap("message", "Movie not found with id:" + movieId), HttpStatus.NOT_FOUND);
+            return new ResponseEntity<>(Collections.singletonMap("message", "Movie not found with id: " + movieId), HttpStatus.NOT_FOUND);
+        }
+    }
+
+    @PutMapping("/update-series/{seriesId}")
+    public ResponseEntity<?> updateSeries(@PathVariable Long seriesId, @RequestBody Series updatedSeries) {
+        Map<String, String> response = adminService.updateSeries(seriesId, updatedSeries);
+        if (response != null) {
+            return new ResponseEntity<>(response, HttpStatus.OK);
+        } else {
+            return new ResponseEntity<>(Collections.singletonMap("message", "Series not found with id: " + seriesId), HttpStatus.NOT_FOUND);
+        }
+    }
+
+    @PutMapping("/update-episode/{seriesId}/{episodeId}")
+    public ResponseEntity<?> updateEpisode(@PathVariable Long seriesId, @PathVariable Long episodeId, @RequestBody Episode updatedEpisode) {
+        Map<String, String> response = adminService.updateEpisode(seriesId, episodeId, updatedEpisode);
+        if (response != null) {
+            return new ResponseEntity<>(response, HttpStatus.OK);
+        } else {
+            return new ResponseEntity<>(Collections.singletonMap("message", "Episode not found with id: " + episodeId + " in series with id: " + seriesId), HttpStatus.NOT_FOUND);
         }
     }
 }
