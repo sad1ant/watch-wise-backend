@@ -6,6 +6,7 @@ public enum WatchStatus {
     WANT_TO_WATCH,
     ABANDONED,
     RECOMMENDED,
+    RATED,
     REVIEWED,
     INTERESTED
 }

@@ -3,11 +3,10 @@ package com.app.watch_wise_backend.service;
 import com.app.watch_wise_backend.model.content.Episode;
 import com.app.watch_wise_backend.model.content.Movie;
 import com.app.watch_wise_backend.model.content.Series;
+import com.app.watch_wise_backend.model.review.Review;
+import com.app.watch_wise_backend.model.review.ReviewStatus;
 import com.app.watch_wise_backend.model.user.User;
-import com.app.watch_wise_backend.repository.EpisodeRepository;
-import com.app.watch_wise_backend.repository.MovieRepository;
-import com.app.watch_wise_backend.repository.SeriesRepository;
-import com.app.watch_wise_backend.repository.UserRepository;
+import com.app.watch_wise_backend.repository.*;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 
@@ -24,6 +23,8 @@ public class AdminService {
     private SeriesRepository seriesRepository;
     @Autowired
     private EpisodeRepository episodeRepository;
+    @Autowired
+    private ReviewRepository reviewRepository;
 
     public List<Map<String, String>> getUserList() {
         List<User> users = userRepository.findAll();
@@ -156,6 +157,22 @@ public class AdminService {
                 response.put("message", "Changes applied successfully");
                 return response;
             }
+        }
+        return null;
+    }
+
+    public Map<String, String> deleteReview(Long reviewId, String reason) {
+        Optional<Review> optionalReview = reviewRepository.findById(reviewId);
+        Map<String, String> response = new HashMap<>();
+
+        if (optionalReview.isPresent()) {
+            Review review = optionalReview.get();
+            review.setReasonDeletion(reason);
+            review.setStatus(ReviewStatus.DELETED);
+            reviewRepository.save(review);
+
+            response.put("message", "Review deleted successfully");
+            return response;
         }
         return null;
     }

@@ -1,6 +1,7 @@
 package com.app.watch_wise_backend.model.content;
 
 import com.app.watch_wise_backend.model.diary.UserMovieDiary;
+import com.app.watch_wise_backend.model.review.Review;
 import jakarta.persistence.*;
 import lombok.*;
 
@@ -73,4 +74,7 @@ public class Movie {
 
     @OneToMany(mappedBy = "movie")
     private List<UserMovieDiary> movieDiary;
+
+    @OneToMany(mappedBy = "movie")
+    private List<Review> review;
 }

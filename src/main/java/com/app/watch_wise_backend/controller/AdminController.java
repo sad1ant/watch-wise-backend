@@ -4,10 +4,12 @@ import com.app.watch_wise_backend.model.content.Episode;
 import com.app.watch_wise_backend.model.content.Movie;
 import com.app.watch_wise_backend.model.content.Series;
 import com.app.watch_wise_backend.service.AdminService;
+import com.fasterxml.jackson.databind.JsonNode;
 import com.fasterxml.jackson.databind.ObjectMapper;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
+import org.springframework.security.core.parameters.P;
 import org.springframework.web.bind.annotation.*;
 
 import java.util.Collections;
@@ -85,6 +87,27 @@ public class AdminController {
             return new ResponseEntity<>(response, HttpStatus.OK);
         } else {
             return new ResponseEntity<>(Collections.singletonMap("message", "Episode not found with id: " + episodeId + " in series with id: " + seriesId), HttpStatus.NOT_FOUND);
+        }
+    }
+
+    @PutMapping("/delete-review/{reviewId}")
+    public ResponseEntity<?> deleteReview(@PathVariable Long reviewId, @RequestBody String request) {
+        ObjectMapper mapper = new ObjectMapper();
+        JsonNode jsonNode;
+        try {
+            jsonNode = mapper.readTree(request);
+        } catch (Exception e) {
+            e.printStackTrace();
+            return new ResponseEntity<>(Collections.singletonMap("message", "Failed to parse request body"), HttpStatus.BAD_REQUEST);
+        }
+
+        String reason = jsonNode.get("reason").asText();
+        Map<String, String> response = adminService.deleteReview(reviewId, reason);
+
+        if (response != null) {
+            return new ResponseEntity<>(response, HttpStatus.OK);
+        } else {
+            return new ResponseEntity<>(Collections.singletonMap("message", "Review not found"), HttpStatus.NOT_FOUND);
         }
     }
 }
