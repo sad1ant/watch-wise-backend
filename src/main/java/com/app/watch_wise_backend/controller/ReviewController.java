@@ -3,6 +3,8 @@ package com.app.watch_wise_backend.controller;
 import com.app.watch_wise_backend.dto.ReviewRequest;
 import com.app.watch_wise_backend.service.AuthService;
 import com.app.watch_wise_backend.service.ReviewService;
+import com.fasterxml.jackson.databind.JsonNode;
+import com.fasterxml.jackson.databind.ObjectMapper;
 import io.jsonwebtoken.Claims;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.HttpStatus;
@@ -38,14 +40,47 @@ public class ReviewController {
         String token = authHeader.substring(7);
         Claims claims = authService.validateAccessToken(token);
         String username = (String) claims.get("username");
-        if (username == null) {
-            return new ResponseEntity<>("sdald", HttpStatus.BAD_REQUEST);
-        }
         Map<String, String> review = reviewService.addSeriesReview(username, request.getSeriesId(), request.getDescription());
         if (review != null) {
             return new ResponseEntity<>(review, HttpStatus.OK);
         } else {
             return new ResponseEntity<>(Collections.singletonMap("message", "Content not found"), HttpStatus.NOT_FOUND);
+        }
+    }
+
+    @DeleteMapping("/delete-review/{reviewId}")
+    public ResponseEntity<?> deleteReview(@PathVariable("reviewId") Long reviewId, @RequestHeader("Authorization") String authHeader) {
+        String token = authHeader.substring(7);
+        Claims claims = authService.validateAccessToken(token);
+        String username = (String) claims.get("username");
+        Map<String, String> response = reviewService.deleteReview(username, reviewId);
+        if (response != null) {
+            return new ResponseEntity<>(response, HttpStatus.OK);
+        } else {
+            return new ResponseEntity<>(Collections.singletonMap("message", "Review not found"), HttpStatus.NOT_FOUND);
+        }
+    }
+
+    @PutMapping("/edit-review/{reviewId}")
+    public ResponseEntity<?> editReview(@PathVariable("reviewId") Long reviewId, @RequestHeader("Authorization") String authHeader, @RequestBody String request) {
+        String token = authHeader.substring(7);
+        Claims claims = authService.validateAccessToken(token);
+        String username = (String) claims.get("username");
+        ObjectMapper mapper = new ObjectMapper();
+        JsonNode jsonNode;
+        try {
+            jsonNode = mapper.readTree(request);
+        } catch (Exception e) {
+            e.printStackTrace();
+            return new ResponseEntity<>(Collections.singletonMap("message", "Failed to parse request body"), HttpStatus.BAD_REQUEST);
+        }
+
+        String description = jsonNode.get("description").asText();
+        Map<String, String> response = reviewService.editReview(username, reviewId, description);
+        if (response != null) {
+            return new ResponseEntity<>(response, HttpStatus.OK);
+        } else {
+            return new ResponseEntity<>(Collections.singletonMap("message", "Review not found"), HttpStatus.NOT_FOUND);
         }
     }
 }

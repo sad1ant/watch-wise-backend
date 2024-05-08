@@ -78,4 +78,48 @@ public class ReviewService {
         response.put("message", "Review added successfully");
         return response;
     }
+
+    public Map<String, String> deleteReview(String username, Long reviewId) {
+        User user = userRepository.findByUsername(username);
+        if (user == null) {
+            return null;
+        }
+
+        Review review = reviewRepository.findById(reviewId).orElse(null);
+        if (review == null) {
+            return null;
+        }
+
+        if (!review.getUser().equals(user)) {
+            return null;
+        }
+        reviewRepository.delete(review);
+
+        Map<String, String> response = new HashMap<>();
+        response.put("message", "Review deleted successfully");
+        return response;
+    }
+
+    public Map<String, String> editReview(String username, Long reviewId, String newDescription) {
+        User user = userRepository.findByUsername(username);
+        if (user == null) {
+            return null;
+        }
+
+        Review review = reviewRepository.findById(reviewId).orElse(null);
+        if (review == null) {
+            return null;
+        }
+
+        if (!review.getUser().equals(user)) {
+            return null;
+        }
+
+        review.setDescription(newDescription);
+        reviewRepository.save(review);
+
+        Map<String, String> response = new HashMap<>();
+        response.put("message", "Review edited successfully");
+        return response;
+    }
 }
