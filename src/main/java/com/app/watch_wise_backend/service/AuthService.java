@@ -83,5 +83,6 @@ public class AuthService {
         refreshTokenCookie.setMaxAge(0);
         refreshTokenCookie.setPath("/");
         response.addCookie(refreshTokenCookie);
+        response.setHeader("Authorization", null);
     }
 }

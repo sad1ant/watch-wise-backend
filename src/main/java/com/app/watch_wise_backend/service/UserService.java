@@ -9,6 +9,7 @@ import org.springframework.security.crypto.password.PasswordEncoder;
 import org.springframework.stereotype.Service;
 
 import java.util.Collections;
+import java.util.HashMap;
 import java.util.Map;
 
 @Service
@@ -36,6 +37,21 @@ public class UserService {
             return authService.generateTokensAndSetCookies(user, response);
         } else {
             return Collections.singletonMap("error", "Invalid credentials");
+        }
+    }
+
+    public Map<String, String> getUserData(String username) {
+        User user = userRepository.findByUsername(username);
+        if (user != null) {
+            Map<String, String> userData = new HashMap<>();
+            userData.put("username", user.getUsername());
+            userData.put("email", user.getEmail());
+            userData.put("fullName", user.getFullName());
+            return userData;
+        } else {
+            Map<String, String> response = new HashMap<>();
+            response.put("error", "User not found");
+            return response;
         }
     }
 }
