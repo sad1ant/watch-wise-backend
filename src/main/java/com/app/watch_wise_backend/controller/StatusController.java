@@ -125,4 +125,32 @@ public class StatusController {
         String username = (String) claims.get("username");
         statusService.removeUserSeriesStatusWatching(username, seriesId);
     }
+
+    // WATCHED STATUS
+    @PostMapping("/movie/{movieId}/watched")
+    @ResponseStatus(HttpStatus.OK)
+    public void setUserMovieStatusWatched(@PathVariable("movieId") Long movieId, @RequestHeader("Authorization") String authHeader) {
+        String token = authHeader.substring(7);
+        Claims claims = authService.validateAccessToken(token);
+        String username = (String) claims.get("username");
+        statusService.setUserMovieStatusWatched(username, movieId);
+    }
+
+    @PostMapping("/series/{seriesId}/watched")
+    @ResponseStatus(HttpStatus.OK)
+    public void setUserSeriesStatusWatched(@PathVariable("seriesId") Long seriesId, @RequestHeader("Authorization") String authHeader) {
+        String token = authHeader.substring(7);
+        Claims claims = authService.validateAccessToken(token);
+        String username = (String) claims.get("username");
+        statusService.setUserSeriesStatusWatched(username, seriesId);
+    }
+
+    @PostMapping("/episode/{episodeId}/series/{seriesId}/watched")
+    @ResponseStatus(HttpStatus.OK)
+    public void setUserEpisodeStatusWatched(@PathVariable("episodeId") Long episodeId, @PathVariable("seriesId") Long seriesId, @RequestHeader("Authorization") String authHeader) {
+        String token = authHeader.substring(7);
+        Claims claims = authService.validateAccessToken(token);
+        String username = (String) claims.get("username");
+        statusService.setUserEpisodeStatusWatched(username, episodeId, seriesId);
+    }
 }
