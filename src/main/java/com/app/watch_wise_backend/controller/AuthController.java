@@ -35,7 +35,7 @@ public class AuthController {
         return new ResponseEntity<>(responseMap, HttpStatus.OK);
     }
 
-    @GetMapping("/auth/refresh")
+    @GetMapping("/refresh")
     public ResponseEntity<?> refresh(@CookieValue(name = "refresh_token", required = false) String refreshToken, HttpServletResponse response) {
         if (refreshToken == null) {
             return new ResponseEntity<>(Collections.singletonMap("message", "Refresh token not found"), HttpStatus.UNAUTHORIZED);

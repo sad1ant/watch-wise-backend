@@ -1,18 +1,15 @@
 package com.app.watch_wise_backend.service;
 
-import com.app.watch_wise_backend.model.content.Movie;
-import com.app.watch_wise_backend.model.content.Series;
+import com.app.watch_wise_backend.model.content.*;
 import com.app.watch_wise_backend.model.review.Review;
 import com.app.watch_wise_backend.model.review.ReviewStatus;
 import com.app.watch_wise_backend.model.user.User;
-import com.app.watch_wise_backend.repository.MovieRepository;
-import com.app.watch_wise_backend.repository.ReviewRepository;
-import com.app.watch_wise_backend.repository.SeriesRepository;
-import com.app.watch_wise_backend.repository.UserRepository;
+import com.app.watch_wise_backend.repository.*;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 
 import java.util.HashMap;
+import java.util.List;
 import java.util.Map;
 import java.util.Optional;
 
@@ -26,6 +23,10 @@ public class ReviewService {
     private MovieRepository movieRepository;
     @Autowired
     private SeriesRepository seriesRepository;
+    @Autowired
+    private UserSeriesStatusRepository seriesStatusRepository;
+    @Autowired
+    private UserMovieStatusRepository movieStatusRepository;
 
     public Map<String, String> addMovieReview(String username, Long movieId, String description) {
         User user = userRepository.findByUsername(username);
@@ -43,10 +44,17 @@ public class ReviewService {
             if (optionalMovie.isPresent()) {
                 Movie movie = optionalMovie.get();
                 review.setMovie(movie);
+
+                UserMovieStatus newUserMovieStatus = new UserMovieStatus();
+                newUserMovieStatus.setUser(user);
+                newUserMovieStatus.setMovie(movie);
+                newUserMovieStatus.setWatchStatus(WatchStatus.REVIEWED);
+                movieStatusRepository.save(newUserMovieStatus);
             } else {
                 return null;
             }
         }
+
         reviewRepository.save(review);
         Map<String, String> response = new HashMap<>();
         response.put("message", "Review added successfully");
@@ -69,6 +77,12 @@ public class ReviewService {
             if (optionalSeries.isPresent()) {
                 Series series = optionalSeries.get();
                 review.setSeries(series);
+
+                UserSeriesStatus newUserSeriesStatus = new UserSeriesStatus();
+                newUserSeriesStatus.setUser(user);
+                newUserSeriesStatus.setSeries(series);
+                newUserSeriesStatus.setWatchStatus(WatchStatus.REVIEWED);
+                seriesStatusRepository.save(newUserSeriesStatus);
             } else {
                 return null;
             }
@@ -94,6 +108,22 @@ public class ReviewService {
             return null;
         }
         reviewRepository.delete(review);
+
+        Movie movie = review.getMovie();
+        if (movie != null) {
+            UserMovieStatus userMovieStatus = movieStatusRepository.findByUserAndMovieAndWatchStatus(user, movie, WatchStatus.REVIEWED);
+            if (userMovieStatus != null) {
+                movieStatusRepository.delete(userMovieStatus);
+            }
+        }
+
+        Series series = review.getSeries();
+        if (series != null) {
+            UserSeriesStatus userSeriesStatus = seriesStatusRepository.findByUserAndSeriesAndWatchStatus(user, series, WatchStatus.REVIEWED);
+            if (userSeriesStatus != null) {
+                seriesStatusRepository.delete(userSeriesStatus);
+            }
+        }
 
         Map<String, String> response = new HashMap<>();
         response.put("message", "Review deleted successfully");

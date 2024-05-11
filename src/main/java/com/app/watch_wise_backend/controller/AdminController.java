@@ -91,7 +91,7 @@ public class AdminController {
     }
 
     @PutMapping("/delete-review/{reviewId}")
-    public ResponseEntity<?> deleteReview(@PathVariable Long reviewId, @RequestBody String request) {
+    public ResponseEntity<?> deleteReview(@PathVariable("reviewId") Long reviewId, @RequestBody String request) {
         ObjectMapper mapper = new ObjectMapper();
         JsonNode jsonNode;
         try {

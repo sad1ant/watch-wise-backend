@@ -1,8 +1,6 @@
 package com.app.watch_wise_backend.service;
 
-import com.app.watch_wise_backend.model.content.Episode;
-import com.app.watch_wise_backend.model.content.Movie;
-import com.app.watch_wise_backend.model.content.Series;
+import com.app.watch_wise_backend.model.content.*;
 import com.app.watch_wise_backend.model.review.Review;
 import com.app.watch_wise_backend.model.review.ReviewStatus;
 import com.app.watch_wise_backend.model.user.User;
@@ -25,6 +23,10 @@ public class AdminService {
     private EpisodeRepository episodeRepository;
     @Autowired
     private ReviewRepository reviewRepository;
+    @Autowired
+    private UserMovieStatusRepository movieStatusRepository;
+    @Autowired
+    private UserSeriesStatusRepository seriesStatusRepository;
 
     public List<Map<String, String>> getUserList() {
         List<User> users = userRepository.findAll();
@@ -167,9 +169,26 @@ public class AdminService {
 
         if (optionalReview.isPresent()) {
             Review review = optionalReview.get();
+            User user = review.getUser();
             review.setReasonDeletion(reason);
             review.setStatus(ReviewStatus.DELETED);
             reviewRepository.save(review);
+
+            Movie movie = review.getMovie();
+            if (movie != null) {
+                UserMovieStatus userMovieStatus = movieStatusRepository.findByUserAndMovieAndWatchStatus(user, movie, WatchStatus.REVIEWED);
+                if (userMovieStatus != null) {
+                    movieStatusRepository.delete(userMovieStatus);
+                }
+            }
+
+            Series series = review.getSeries();
+            if (series != null) {
+                UserSeriesStatus userSeriesStatus = seriesStatusRepository.findByUserAndSeriesAndWatchStatus(user, series, WatchStatus.REVIEWED);
+                if (userSeriesStatus != null) {
+                    seriesStatusRepository.delete(userSeriesStatus);
+                }
+            }
 
             response.put("message", "Review deleted successfully");
             return response;
