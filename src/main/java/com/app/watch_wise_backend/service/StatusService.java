@@ -374,7 +374,6 @@ public class StatusService {
         }
     }
 
-    // TODO redo change method
     public void setUserEpisodeStatusWatched(String username, Long episodeId, Long seriesId) {
         User user = userRepository.findByUsername(username);
         if (user == null) {
@@ -393,59 +392,51 @@ public class StatusService {
             userEpisodeStatus.setEpisode(episode);
             userEpisodeStatus.setWatchStatus(WatchStatus.WATCHED);
             episodeStatusRepository.save(userEpisodeStatus);
+        }
 
-            Optional<Series> optionalSeries = seriesRepository.findById(seriesId);
-            Series series = optionalSeries.orElse(null);
-            if (series == null) {
-                return;
-            }
+        Series series = seriesRepository.findById(seriesId).orElse(null);
+        if (series == null) {
+            return;
+        }
 
-            boolean allWatched = series.getEpisodes().stream()
-                    .allMatch(ep -> {
-                        UserEpisodeStatus episodeStatus = episodeStatusRepository.findByUserAndEpisode(user, ep);
-                        return episodeStatus != null && episodeStatus.getWatchStatus() == WatchStatus.WATCHED;
-                    });
+        boolean allWatched = series.getEpisodes().stream().allMatch(ep -> {
+            UserEpisodeStatus episodeStatus = episodeStatusRepository.findByUserAndEpisode(user, ep);
+            return episodeStatus != null && episodeStatus.getWatchStatus() == WatchStatus.WATCHED;
+        });
 
-            UserSeriesStatus userSeriesStatus = seriesStatusRepository.findByUserAndSeries(user, series);
-            UserSeriesStatus userSeriesStatusWatching = seriesStatusRepository.findByUserAndSeriesAndWatchStatus(user, series, WatchStatus.WATCHING);
-            UserSeriesStatus userSeriesStatusWatched = seriesStatusRepository.findByUserAndSeriesAndWatchStatus(user, series, WatchStatus.WATCHED);
-            if (userSeriesStatus != null) {
-                if (allWatched && userSeriesStatusWatched == null) {
-                    if (userSeriesStatusWatching != null) {
-                        userSeriesStatusWatching.setWatchStatus(WatchStatus.WATCHED);
-                        seriesStatusRepository.save(userSeriesStatusWatching);
-                    } else {
-                        userSeriesStatusWatched.setWatchStatus(WatchStatus.WATCHED);
-                        seriesStatusRepository.save(userSeriesStatusWatched);
-                    }
-                } else if (!allWatched && userSeriesStatusWatching == null) {
-                    if (userSeriesStatusWatched != null) {
-                        return;
-                    } else {
-                        userSeriesStatusWatching.setWatchStatus(WatchStatus.WATCHING);
-                        seriesStatusRepository.save(userSeriesStatusWatching);
-                    }
+        if (allWatched) {
+            UserSeriesStatus userSeriesStatus = seriesStatusRepository.findByUserAndSeriesAndWatchStatus(user, series, WatchStatus.WATCHED);
+            if (userSeriesStatus == null) {
+                UserSeriesStatus userSeriesStatusWatching = seriesStatusRepository.findByUserAndSeriesAndWatchStatus(user, series, WatchStatus.WATCHING);
+                if (userSeriesStatusWatching != null) {
+                    seriesStatusRepository.delete(userSeriesStatusWatching);
+                    userSeriesStatusWatching.setWatchStatus(WatchStatus.WATCHED);
+                    seriesStatusRepository.save(userSeriesStatusWatching);
+                } else {
+                    userSeriesStatus = new UserSeriesStatus();
+                    userSeriesStatus.setUser(user);
+                    userSeriesStatus.setSeries(series);
+                    userSeriesStatus.setWatchStatus(WatchStatus.WATCHED);
+                    seriesStatusRepository.save(userSeriesStatus);
                 }
-                seriesStatusRepository.save(userSeriesStatus);
-            } else {
-                userSeriesStatus = new UserSeriesStatus();
-                userSeriesStatus.setUser(user);
-                userSeriesStatus.setSeries(series);
-                if (allWatched && userSeriesStatusWatched == null) {
-                    if (userSeriesStatusWatching != null) {
-                        userSeriesStatusWatching.setWatchStatus(WatchStatus.WATCHED);
-                        seriesStatusRepository.save(userSeriesStatusWatching);
-                    } else {
-                        userSeriesStatusWatched.setWatchStatus(WatchStatus.WATCHED);
-                        seriesStatusRepository.save(userSeriesStatusWatched);
-                    }
-                } else if (!allWatched && userSeriesStatusWatching == null) {
-                    if (userSeriesStatusWatched != null) {
-                        return;
-                    } else {
-                        userSeriesStatusWatching.setWatchStatus(WatchStatus.WATCHING);
-                        seriesStatusRepository.save(userSeriesStatusWatching);
-                    }
+            }
+        } else {
+            UserSeriesStatus userSeriesStatus = seriesStatusRepository.findByUserAndSeriesAndWatchStatus(user, series, WatchStatus.WATCHING);
+            if (userSeriesStatus == null) {
+                UserSeriesStatus userSeriesStatusWatched = seriesStatusRepository.findByUserAndSeriesAndWatchStatus(user, series, WatchStatus.WATCHED);
+                UserSeriesStatus userSeriesStatusWantToWatch = seriesStatusRepository.findByUserAndSeriesAndWatchStatus(user, series, WatchStatus.WANT_TO_WATCH);
+                if (userSeriesStatusWatched != null) {
+                    return;
+                } else if (userSeriesStatusWantToWatch != null) {
+                    seriesStatusRepository.delete(userSeriesStatusWantToWatch);
+                    userSeriesStatusWantToWatch.setWatchStatus(WatchStatus.WATCHING);
+                    seriesStatusRepository.save(userSeriesStatusWantToWatch);
+                } else {
+                    userSeriesStatus = new UserSeriesStatus();
+                    userSeriesStatus.setUser(user);
+                    userSeriesStatus.setSeries(series);
+                    userSeriesStatus.setWatchStatus(WatchStatus.WATCHING);
+                    seriesStatusRepository.save(userSeriesStatus);
                 }
             }
         }
