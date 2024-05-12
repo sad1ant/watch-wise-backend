@@ -153,4 +153,60 @@ public class StatusController {
         String username = (String) claims.get("username");
         statusService.setUserEpisodeStatusWatched(username, episodeId, seriesId);
     }
+
+    // RECOMMENDED STATUS
+    @PostMapping("/movie/{movieId}/recommended")
+    @ResponseStatus(HttpStatus.OK)
+    public void setUserMovieStatusRecommended(@PathVariable("movieId") Long movieId, @RequestHeader("Authorization") String authHeader) {
+        String token = authHeader.substring(7);
+        Claims claims = authService.validateAccessToken(token);
+        String username = (String) claims.get("username");
+        statusService.setUserMovieStatusRecommended(username, movieId);
+    }
+
+    @PostMapping("/series/{seriesId}/recommended")
+    @ResponseStatus(HttpStatus.OK)
+    public void setUserSeriesStatusRecommended(@PathVariable("seriesId") Long seriesId, @RequestHeader("Authorization") String authHeader) {
+        String token = authHeader.substring(7);
+        Claims claims = authService.validateAccessToken(token);
+        String username = (String) claims.get("username");
+        statusService.setUserSeriesStatusRecommended(username, seriesId);
+    }
+
+    @DeleteMapping("/movie/{movieId}/recommended")
+    @ResponseStatus(HttpStatus.OK)
+    public void removeUserMovieStatusRecommended(@PathVariable("movieId") Long movieId, @RequestHeader("Authorization") String authHeader) {
+        String token = authHeader.substring(7);
+        Claims claims = authService.validateAccessToken(token);
+        String username = (String) claims.get("username");
+        statusService.removeUserMovieStatusRecommended(username, movieId);
+    }
+
+    @DeleteMapping("/series/{seriesId}/recommended")
+    @ResponseStatus(HttpStatus.OK)
+    public void removeUserSeriesStatusRecommended(@PathVariable("seriesId") Long seriesId, @RequestHeader("Authorization") String authHeader) {
+        String token = authHeader.substring(7);
+        Claims claims = authService.validateAccessToken(token);
+        String username = (String) claims.get("username");
+        statusService.removeUserSeriesStatusRecommended(username, seriesId);
+    }
+
+    // ABANDONED STATUS
+    @PostMapping("/movie/{movieId}/abandoned")
+    @ResponseStatus(HttpStatus.OK)
+    public void setUserMovieStatusAbandoned(@PathVariable("movieId") Long movieId, @RequestHeader("Authorization") String authHeader) {
+        String token = authHeader.substring(7);
+        Claims claims = authService.validateAccessToken(token);
+        String username = (String) claims.get("username");
+        statusService.setUserMovieStatusAbandoned(username, movieId);
+    }
+
+    @PostMapping("/series/{seriesId}/abandoned")
+    @ResponseStatus(HttpStatus.OK)
+    public void setUserSeriesStatusAbandoned(@PathVariable("seriesId") Long seriesId, @RequestHeader("Authorization") String authHeader) {
+        String token = authHeader.substring(7);
+        Claims claims = authService.validateAccessToken(token);
+        String username = (String) claims.get("username");
+        statusService.setUserSeriesStatusAbandoned(username, seriesId);
+    }
 }

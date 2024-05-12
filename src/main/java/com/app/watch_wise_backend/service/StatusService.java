@@ -6,8 +6,8 @@ import com.app.watch_wise_backend.repository.*;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 
+import java.time.LocalDateTime;
 import java.util.List;
-import java.util.Optional;
 
 @Service
 public class StatusService {
@@ -204,24 +204,27 @@ public class StatusService {
             return;
         }
 
-        UserMovieStatus userMovieStatusWantToWatch = movieStatusRepository.findByUserAndMovieAndWatchStatus(user, movie, WatchStatus.WANT_TO_WATCH);
-        if (userMovieStatusWantToWatch != null) {
+        UserMovieStatus userMovieStatusWatching = movieStatusRepository.findByUserAndMovieAndWatchStatus(user, movie, WatchStatus.WATCHING);
+        if (userMovieStatusWatching == null) {
             UserMovieStatus userMovieStatusWatched = movieStatusRepository.findByUserAndMovieAndWatchStatus(user, movie, WatchStatus.WATCHED);
+            UserMovieStatus userMovieStatusAbandoned = movieStatusRepository.findByUserAndMovieAndWatchStatus(user, movie, WatchStatus.ABANDONED);
+            UserMovieStatus userMovieStatusWantToWatch = movieStatusRepository.findByUserAndMovieAndWatchStatus(user, movie, WatchStatus.WANT_TO_WATCH);
+
             if (userMovieStatusWatched != null) {
                 return;
+            } else if (userMovieStatusAbandoned != null) {
+                userMovieStatusAbandoned.setWatchStatus(WatchStatus.WATCHING);
+                movieStatusRepository.save(userMovieStatusAbandoned);
+            } else if (userMovieStatusWantToWatch != null) {
+                userMovieStatusWantToWatch.setWatchStatus(WatchStatus.WATCHING);
+                movieStatusRepository.save(userMovieStatusWantToWatch);
+            } else {
+                userMovieStatusWatching = new UserMovieStatus();
+                userMovieStatusWatching.setUser(user);
+                userMovieStatusWatching.setMovie(movie);
+                userMovieStatusWatching.setWatchStatus(WatchStatus.WATCHING);
+                movieStatusRepository.save(userMovieStatusWatching);
             }
-            userMovieStatusWantToWatch.setWatchStatus(WatchStatus.WATCHING);
-            movieStatusRepository.save(userMovieStatusWantToWatch);
-        } else {
-            UserMovieStatus userMovieStatusWatched = movieStatusRepository.findByUserAndMovieAndWatchStatus(user, movie, WatchStatus.WATCHED);
-            if (userMovieStatusWatched != null) {
-                return;
-            }
-            userMovieStatusWantToWatch = new UserMovieStatus();
-            userMovieStatusWantToWatch.setUser(user);
-            userMovieStatusWantToWatch.setMovie(movie);
-            userMovieStatusWantToWatch.setWatchStatus(WatchStatus.WATCHING);
-            movieStatusRepository.save(userMovieStatusWantToWatch);
         }
     }
 
@@ -236,26 +239,28 @@ public class StatusService {
             return;
         }
 
-        UserSeriesStatus userSeriesStatusWantToWatch = seriesStatusRepository.findByUserAndSeriesAndWatchStatus(user, series, WatchStatus.WANT_TO_WATCH);
-        if (userSeriesStatusWantToWatch != null) {
+        UserSeriesStatus userSeriesStatusWatching = seriesStatusRepository.findByUserAndSeriesAndWatchStatus(user, series, WatchStatus.WATCHING);
+        if (userSeriesStatusWatching == null) {
             UserSeriesStatus userSeriesStatusWatched = seriesStatusRepository.findByUserAndSeriesAndWatchStatus(user, series, WatchStatus.WATCHED);
-            if (userSeriesStatusWatched != null) {
-                return;
-            }
-            userSeriesStatusWantToWatch.setWatchStatus(WatchStatus.WATCHING);
-            seriesStatusRepository.save(userSeriesStatusWantToWatch);
-        } else {
-            UserSeriesStatus userSeriesStatusWatched = seriesStatusRepository.findByUserAndSeriesAndWatchStatus(user, series, WatchStatus.WATCHED);
-            if (userSeriesStatusWatched != null) {
-                return;
-            }
-            userSeriesStatusWantToWatch = new UserSeriesStatus();
-            userSeriesStatusWantToWatch.setUser(user);
-            userSeriesStatusWantToWatch.setSeries(series);
-            userSeriesStatusWantToWatch.setWatchStatus(WatchStatus.WATCHING);
-            seriesStatusRepository.save(userSeriesStatusWantToWatch);
-        }
+            UserSeriesStatus userSeriesStatusAbandoned = seriesStatusRepository.findByUserAndSeriesAndWatchStatus(user, series, WatchStatus.ABANDONED);
+            UserSeriesStatus userSeriesStatusWantToWatch = seriesStatusRepository.findByUserAndSeriesAndWatchStatus(user, series, WatchStatus.WANT_TO_WATCH);
 
+            if (userSeriesStatusWatched != null) {
+                return;
+            } else if (userSeriesStatusAbandoned != null) {
+                userSeriesStatusAbandoned.setWatchStatus(WatchStatus.WATCHING);
+                seriesStatusRepository.save(userSeriesStatusAbandoned);
+            } else if (userSeriesStatusWantToWatch != null) {
+                userSeriesStatusWantToWatch.setWatchStatus(WatchStatus.WATCHING);
+                seriesStatusRepository.save(userSeriesStatusWantToWatch);
+            } else {
+                userSeriesStatusWatching = new UserSeriesStatus();
+                userSeriesStatusWatching.setUser(user);
+                userSeriesStatusWatching.setSeries(series);
+                userSeriesStatusWatching.setWatchStatus(WatchStatus.WATCHING);
+                seriesStatusRepository.save(userSeriesStatusWatching);
+            }
+        }
     }
 
     public void removeUserMovieStatusWatching(String username, Long movieId) {
@@ -308,12 +313,16 @@ public class StatusService {
         if (userMovieStatusWatched == null) {
             UserMovieStatus userMovieStatusWantToWatch = movieStatusRepository.findByUserAndMovieAndWatchStatus(user, movie, WatchStatus.WANT_TO_WATCH);
             UserMovieStatus userMovieStatusWatching = movieStatusRepository.findByUserAndMovieAndWatchStatus(user, movie, WatchStatus.WATCHING);
+            UserMovieStatus userMovieStatusAbandoned = movieStatusRepository.findByUserAndMovieAndWatchStatus(user, movie, WatchStatus.ABANDONED);
             if (userMovieStatusWatching != null) {
                 userMovieStatusWatching.setWatchStatus(WatchStatus.WATCHED);
                 movieStatusRepository.save(userMovieStatusWatching);
             } else if (userMovieStatusWantToWatch != null) {
                 userMovieStatusWantToWatch.setWatchStatus(WatchStatus.WANT_TO_WATCH);
                 movieStatusRepository.save(userMovieStatusWantToWatch);
+            } else if (userMovieStatusAbandoned != null) {
+                userMovieStatusAbandoned.setWatchStatus(WatchStatus.WATCHED);
+                movieStatusRepository.save(userMovieStatusAbandoned);
             } else {
                 userMovieStatusWatched = new UserMovieStatus();
                 userMovieStatusWatched.setUser(user);
@@ -341,6 +350,7 @@ public class StatusService {
         if (userSeriesStatusWatched == null) {
             UserSeriesStatus userSeriesStatusWatching = seriesStatusRepository.findByUserAndSeriesAndWatchStatus(user, series, WatchStatus.WATCHING);
             UserSeriesStatus userSeriesStatusWantToWatch = seriesStatusRepository.findByUserAndSeriesAndWatchStatus(user, series, WatchStatus.WANT_TO_WATCH);
+            UserSeriesStatus userSeriesStatusAbandoned = seriesStatusRepository.findByUserAndSeriesAndWatchStatus(user, series, WatchStatus.ABANDONED);
             if (userSeriesStatusWatching != null) {
                 userSeriesStatusWatching.setWatchStatus(WatchStatus.WATCHED);
 
@@ -359,6 +369,15 @@ public class StatusService {
                 }
 
                 seriesStatusRepository.save(userSeriesStatusWantToWatch);
+            } else if (userSeriesStatusAbandoned != null) {
+                userSeriesStatusAbandoned.setWatchStatus(WatchStatus.WATCHED);
+
+                List<Episode> episodes = series.getEpisodes();
+                for (Episode episode : episodes) {
+                    setUserEpisodeStatusWatched(username, episode.getId(), seriesId);
+                }
+
+                seriesStatusRepository.save(userSeriesStatusAbandoned);
             } else {
                 userSeriesStatusWatched = new UserSeriesStatus();
                 userSeriesStatusWatched.setUser(user);
@@ -425,12 +444,17 @@ public class StatusService {
             if (userSeriesStatus == null) {
                 UserSeriesStatus userSeriesStatusWatched = seriesStatusRepository.findByUserAndSeriesAndWatchStatus(user, series, WatchStatus.WATCHED);
                 UserSeriesStatus userSeriesStatusWantToWatch = seriesStatusRepository.findByUserAndSeriesAndWatchStatus(user, series, WatchStatus.WANT_TO_WATCH);
+                UserSeriesStatus userSeriesStatusAbandoned = seriesStatusRepository.findByUserAndSeriesAndWatchStatus(user, series, WatchStatus.ABANDONED);
                 if (userSeriesStatusWatched != null) {
                     return;
                 } else if (userSeriesStatusWantToWatch != null) {
                     seriesStatusRepository.delete(userSeriesStatusWantToWatch);
                     userSeriesStatusWantToWatch.setWatchStatus(WatchStatus.WATCHING);
                     seriesStatusRepository.save(userSeriesStatusWantToWatch);
+                } else if (userSeriesStatusAbandoned != null) {
+                    seriesStatusRepository.delete(userSeriesStatusAbandoned);
+                    userSeriesStatusAbandoned.setWatchStatus(WatchStatus.ABANDONED);
+                    seriesStatusRepository.save(userSeriesStatusAbandoned);
                 } else {
                     userSeriesStatus = new UserSeriesStatus();
                     userSeriesStatus.setUser(user);
@@ -443,4 +467,124 @@ public class StatusService {
     }
 
     // RECOMMENDED STATUS
+    public void setUserMovieStatusRecommended(String username, Long movieId) {
+        User user = userRepository.findByUsername(username);
+        if (user == null) {
+            return;
+        }
+
+        Movie movie = movieRepository.findById(movieId).orElse(null);
+        if (movie == null) {
+            return;
+        }
+
+        UserMovieStatus userMovieStatus = movieStatusRepository.findByUserAndMovieAndWatchStatus(user, movie, WatchStatus.RECOMMENDED);
+        if (userMovieStatus == null) {
+            userMovieStatus = new UserMovieStatus();
+            userMovieStatus.setUser(user);
+            userMovieStatus.setMovie(movie);
+            userMovieStatus.setWatchStatus(WatchStatus.RECOMMENDED);
+        }
+
+        movieStatusRepository.save(userMovieStatus);
+    }
+
+    public void setUserSeriesStatusRecommended(String username, Long seriesId) {
+        User user = userRepository.findByUsername(username);
+        if (user == null) {
+            return;
+        }
+
+        Series series = seriesRepository.findById(seriesId).orElse(null);
+        if (series == null) {
+            return;
+        }
+
+        UserSeriesStatus userSeriesStatus = seriesStatusRepository.findByUserAndSeriesAndWatchStatus(user, series, WatchStatus.RECOMMENDED);
+        if (userSeriesStatus == null) {
+            userSeriesStatus = new UserSeriesStatus();
+            userSeriesStatus.setUser(user);
+            userSeriesStatus.setSeries(series);
+            userSeriesStatus.setWatchStatus(WatchStatus.RECOMMENDED);
+        }
+
+        seriesStatusRepository.save(userSeriesStatus);
+    }
+
+    public void removeUserMovieStatusRecommended(String username, Long movieId) {
+        User user = userRepository.findByUsername(username);
+        if (user == null) {
+            return;
+        }
+
+        Movie movie = movieRepository.findById(movieId).orElse(null);
+        if (movie == null) {
+            return;
+        }
+
+        UserMovieStatus userMovieStatus = movieStatusRepository.findByUserAndMovieAndWatchStatus(user, movie, WatchStatus.RECOMMENDED);
+        if (userMovieStatus != null) {
+            movieStatusRepository.delete(userMovieStatus);
+        }
+    }
+
+    public void removeUserSeriesStatusRecommended(String username, Long seriesId) {
+        User user = userRepository.findByUsername(username);
+        if (user == null) {
+            return;
+        }
+
+        Series series = seriesRepository.findById(seriesId).orElse(null);
+        if (series == null) {
+            return;
+        }
+
+        UserSeriesStatus userSeriesStatus = seriesStatusRepository.findByUserAndSeriesAndWatchStatus(user, series, WatchStatus.RECOMMENDED);
+        if (userSeriesStatus != null) {
+            seriesStatusRepository.delete(userSeriesStatus);
+        }
+    }
+
+    // ABANDONED STATUS
+    public void setUserMovieStatusAbandoned(String username, Long movieId) {
+        User user = userRepository.findByUsername(username);
+        if (user == null) {
+            return;
+        }
+
+        Movie movie = movieRepository.findById(movieId).orElse(null);
+        if (movie == null) {
+            return;
+        }
+
+        UserMovieStatus userMovieStatus = movieStatusRepository.findByUserAndMovieAndWatchStatus(user, movie, WatchStatus.WATCHING);
+        if (userMovieStatus != null) {
+            movieStatusRepository.delete(userMovieStatus);
+            userMovieStatus.setWatchStatus(WatchStatus.ABANDONED);
+            movieStatusRepository.save(userMovieStatus);
+        } else {
+            return;
+        }
+    }
+
+    public void setUserSeriesStatusAbandoned(String username, Long seriesId) {
+        User user = userRepository.findByUsername(username);
+        if (user == null) {
+            return;
+        }
+
+        Series series = seriesRepository.findById(seriesId).orElse(null);
+        if (series == null) {
+            return;
+        }
+
+        UserSeriesStatus userSeriesStatus = seriesStatusRepository.findByUserAndSeriesAndWatchStatus(user, series, WatchStatus.WATCHING);
+        if (userSeriesStatus != null) {
+            seriesStatusRepository.delete(userSeriesStatus);
+            userSeriesStatus.setWatchStatus(WatchStatus.ABANDONED);
+            seriesStatusRepository.save(userSeriesStatus);
+        } else {
+            return;
+        }
+    }
 }
