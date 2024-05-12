@@ -29,7 +29,7 @@ public class Episode {
     private Integer episodeNumber;
 
     @Column(name = "duration", nullable = false)
-    private String duration;
+    private Integer duration;
 
     @Column(name = "image", nullable = false)
     private String image;
