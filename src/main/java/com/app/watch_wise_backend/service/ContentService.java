@@ -1,5 +1,6 @@
 package com.app.watch_wise_backend.service;
 
+import com.app.watch_wise_backend.dto.FilterParams;
 import com.app.watch_wise_backend.dto.MovieDTO;
 import com.app.watch_wise_backend.dto.SeriesDTO;
 import com.app.watch_wise_backend.model.content.*;
@@ -7,10 +8,12 @@ import com.app.watch_wise_backend.model.review.Review;
 import com.app.watch_wise_backend.model.review.ReviewStatus;
 import com.app.watch_wise_backend.model.user.User;
 import com.app.watch_wise_backend.repository.*;
+import jakarta.persistence.criteria.Subquery;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.data.domain.Page;
 import org.springframework.data.domain.PageRequest;
 import org.springframework.data.domain.Pageable;
+import org.springframework.data.jpa.domain.Specification;
 import org.springframework.stereotype.Service;
 
 import java.util.ArrayList;
@@ -200,5 +203,113 @@ public class ContentService {
             return map;
         }
         return null;
+    }
+
+    // TODO redo
+    public Page<MovieDTO> getFilteredMovies(FilterParams params, int page, int size) {
+        Pageable pageable = PageRequest.of(page, size);
+        Specification<Movie> spec = Specification.where(null);
+
+        if (params.getGenre() != null) {
+            spec = spec.and((root, query, cb) -> cb.equal(root.get("genre"), params.getGenre()));
+        }
+        if (params.getStartYear() != null && params.getEndYear() != null) {
+            spec = spec.and((root, query, cb) -> cb.between(root.get("releaseYear"), params.getStartYear(), params.getEndYear()));
+        }
+        if (params.getArtist() != null) {
+            spec = spec.and((root, query, cb) -> cb.like(root.get("artists"), "%" + params.getArtist() + "%"));
+        }
+        if (params.getAgeRating() != null) {
+            spec = spec.and((root, query, cb) -> cb.equal(root.get("ageRating"), params.getAgeRating()));
+        }
+        if (params.getRating() != null) {
+            spec = spec.and((root, query, cb) -> cb.equal(root.get("rating"), params.getRating()));
+        }
+        if (params.getCountry() != null) {
+            spec = spec.and((root, query, cb) -> cb.equal(root.get("country"), params.getCountry()));
+        }
+
+        Page<Movie> movies = movieRepository.findAll(spec, pageable);
+        return movies.map(movie -> new MovieDTO(
+                movie.getId(),
+                movie.getTitle(),
+                movie.getGenre(),
+                movie.getReleaseYear(),
+                movie.getRating(),
+                movie.getImage()
+        ));
+    }
+
+    // TODO redo
+    public Page<SeriesDTO> getFilteredSeries(FilterParams params, int page, int size) {
+        Pageable pageable = PageRequest.of(page, size);
+        Specification<Series> spec = Specification.where(null);
+
+        if (params.getGenre() != null) {
+            spec = spec.and((root, query, cb) -> cb.equal(root.get("genre"), params.getGenre()));
+        }
+        if (params.getStartYear() != null && params.getEndYear() != null) {
+            spec = spec.and((root, query, cb) -> cb.between(root.get("releaseYear"), params.getStartYear(), params.getEndYear()));
+        }
+        if (params.getArtist() != null) {
+            spec = spec.and((root, query, cb) -> cb.like(root.get("artists"), "%" + params.getArtist() + "%"));
+        }
+        if (params.getAgeRating() != null) {
+            spec = spec.and((root, query, cb) -> cb.equal(root.get("ageRating"), params.getAgeRating()));
+        }
+        if (params.getRating() != null) {
+            spec = spec.and((root, query, cb) -> cb.equal(root.get("rating"), params.getRating()));
+        }
+        if (params.getCountry() != null) {
+            spec = spec.and((root, query, cb) -> cb.equal(root.get("country"), params.getCountry()));
+        }
+
+        Page<Series> series = seriesRepository.findAll(spec, pageable);
+        return series.map(s -> new SeriesDTO(
+                s.getId(),
+                s.getTitle(),
+                s.getGenre(),
+                s.getReleaseYear(),
+                s.getRating(),
+                s.getImage()
+        ));
+    }
+
+    public Page<MovieDTO> searchMoviesByTitle(String title, int page, int size) {
+        Pageable pageable = PageRequest.of(page, size);
+        Specification<Movie> spec = Specification.where(null);
+
+        if (title != null && !title.isEmpty()) {
+            spec = spec.and((root, query, cb) -> cb.like(cb.lower(root.get("title")), "%" + title.toLowerCase() + "%"));
+        }
+
+        Page<Movie> movies = movieRepository.findAll(spec, pageable);
+        return movies.map(movie -> new MovieDTO(
+                movie.getId(),
+                movie.getTitle(),
+                movie.getGenre(),
+                movie.getReleaseYear(),
+                movie.getRating(),
+                movie.getImage()
+        ));
+    }
+
+    public Page<SeriesDTO> searchSeriesByTitle(String title, int page, int size) {
+        Pageable pageable = PageRequest.of(page, size);
+        Specification<Series> spec = Specification.where(null);
+
+        if (title != null && !title.isEmpty()) {
+            spec = spec.and((root, query, cb) -> cb.like(cb.lower(root.get("title")), "%" + title.toLowerCase() + "%"));
+        }
+
+        Page<Series> series = seriesRepository.findAll(spec, pageable);
+        return series.map(s -> new SeriesDTO(
+                s.getId(),
+                s.getTitle(),
+                s.getGenre(),
+                s.getReleaseYear(),
+                s.getRating(),
+                s.getImage()
+        ));
     }
 }
