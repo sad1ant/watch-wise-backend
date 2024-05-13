@@ -69,6 +69,11 @@ public class Movie {
     @Column(name = "image", nullable = false)
     private String image;
 
+    @ElementCollection
+    @CollectionTable(name = "movie_ratings", joinColumns = @JoinColumn(name = "movie_id"))
+    @Column(name = "rating")
+    private List<Integer> ratings;
+
     @OneToMany(mappedBy = "movie")
     private List<UserMovieStatus> movieStatuses;
 

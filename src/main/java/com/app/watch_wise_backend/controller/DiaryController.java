@@ -104,4 +104,32 @@ public class DiaryController {
             return new ResponseEntity<>(Collections.singletonMap("message", "Error"), HttpStatus.BAD_REQUEST);
         }
     }
+
+    @GetMapping("/movie-diary")
+    public ResponseEntity<?> getMovieDiary(@RequestHeader("Authorization") String authHeader) {
+        String token = authHeader.substring(7);
+        Claims claims = authService.validateAccessToken(token);
+        String username = (String) claims.get("username");
+
+        Map<String, Object> response = diaryService.getMovieDiary(username);
+        if (response != null) {
+            return new ResponseEntity<>(response, HttpStatus.OK);
+        } else {
+            return new ResponseEntity<>(Collections.singletonMap("message", "Error"), HttpStatus.BAD_REQUEST);
+        }
+    }
+
+    @GetMapping("/series-diary")
+    public ResponseEntity<?> getSeriesDiary(@RequestHeader("Authorization") String authHeader) {
+        String token = authHeader.substring(7);
+        Claims claims = authService.validateAccessToken(token);
+        String username = (String) claims.get("username");
+
+        Map<String, Object> response = diaryService.getSeriesDiary(username);
+        if (response != null) {
+            return new ResponseEntity<>(response, HttpStatus.OK);
+        } else {
+            return new ResponseEntity<>(Collections.singletonMap("message", "Error"), HttpStatus.BAD_REQUEST);
+        }
+    }
 }
