@@ -14,4 +14,5 @@ public interface UserSeriesStatusRepository extends JpaRepository<UserSeriesStat
     UserSeriesStatus findByUserAndSeriesAndWatchStatus(User user, Series series, WatchStatus watchStatus);
     UserSeriesStatus findByUserAndSeries(User user, Series series);
     List<UserSeriesStatus> findByUserAndWatchStatus(User user, WatchStatus watchStatus);
+    List<UserSeriesStatus> findAllByUserAndSeries(User user, Series series);
 }

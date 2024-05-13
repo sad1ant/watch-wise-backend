@@ -88,9 +88,6 @@ public class UserService {
             Map<String, Integer> movieGenresCount = new HashMap<>();
             Map<String, Integer> seriesGenresCount = new HashMap<>();
 
-            Double bestMovieRating = 0.0;
-            Double bestSeriesRating = 0.0;
-
             int totalMoviesInDiary = movieDiary.size();
             int totalSeriesInDiary = seriesDiary.size();
 
@@ -108,10 +105,6 @@ public class UserService {
                     if (episodeStatus != null && episodeStatus.getWatchStatus() == WatchStatus.WATCHED) {
                         totalSeriesDuration += episode.getDuration();
                     }
-                }
-
-                if (series.getRating() > bestSeriesRating) {
-                    bestSeriesRating = series.getRating();
                 }
 
                 watchedSeriesCount++;
@@ -140,10 +133,6 @@ public class UserService {
 
                 movieGenresCount.put(movie.getGenre(), movieGenresCount.getOrDefault(movie.getGenre(), 0) + 1);
 
-                if (movie.getRating() > bestMovieRating) {
-                    bestMovieRating = movie.getRating();
-                }
-
                 completedMoviesCount++;
             }
 
@@ -164,8 +153,6 @@ public class UserService {
             statistics.put("totalSeriesDuration", totalSeriesDurationFormatted);
             statistics.put("mostWatchedMovieGenre", mostWatchedMovieGenre);
             statistics.put("mostWatchedSeriesGenre", mostWatchedSeriesGenre);
-            statistics.put("bestMovieRating", bestMovieRating);
-            statistics.put("bestSeriesRating", bestSeriesRating);
             statistics.put("completedSeriesPercent", (double) completedSeriesCount / totalSeriesInDiary * 100);
             statistics.put("completedMoviesPercent", (double) completedMoviesCount / totalMoviesInDiary * 100);
 

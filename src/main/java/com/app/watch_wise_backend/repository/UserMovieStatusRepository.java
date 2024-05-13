@@ -13,5 +13,6 @@ import java.util.List;
 public interface UserMovieStatusRepository extends JpaRepository<UserMovieStatus, Long> {
     UserMovieStatus findByUserAndMovieAndWatchStatus(User user, Movie movie, WatchStatus watchStatus);
     UserMovieStatus findByUserAndMovie(User user, Movie movie);
+    List<UserMovieStatus> findAllByUserAndMovie(User user, Movie movie);
     List<UserMovieStatus> findByUserAndWatchStatus(User user, WatchStatus watchStatus);
 }
