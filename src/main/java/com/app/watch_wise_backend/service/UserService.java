@@ -94,50 +94,54 @@ public class UserService {
             int completedSeriesCount = 0;
             int completedMoviesCount = 0;
 
-            for (UserSeriesStatus seriesStatus : watchedSeries) {
-                Series series = seriesStatus.getSeries();
+            if (!watchedSeries.isEmpty() || !watchingSeries.isEmpty()) {
+                for (UserSeriesStatus seriesStatus : watchedSeries) {
+                    Series series = seriesStatus.getSeries();
 
-                seriesGenresCount.put(series.getGenre(), seriesGenresCount.getOrDefault(series.getGenre(), 0) + 1);
+                    seriesGenresCount.put(series.getGenre(), seriesGenresCount.getOrDefault(series.getGenre(), 0) + 1);
 
-                List<Episode> episodes = series.getEpisodes();
-                for (Episode episode : episodes) {
-                    UserEpisodeStatus episodeStatus = episodeStatusRepository.findByUserAndEpisode(user, episode);
-                    if (episodeStatus != null && episodeStatus.getWatchStatus() == WatchStatus.WATCHED) {
-                        totalSeriesDuration += episode.getDuration();
+                    List<Episode> episodes = series.getEpisodes();
+                    for (Episode episode : episodes) {
+                        UserEpisodeStatus episodeStatus = episodeStatusRepository.findByUserAndEpisode(user, episode);
+                        if (episodeStatus != null && episodeStatus.getWatchStatus() == WatchStatus.WATCHED) {
+                            totalSeriesDuration += episode.getDuration();
+                        }
                     }
-                }
 
-                watchedSeriesCount++;
-                completedSeriesCount++;
-            }
-
-            for (UserSeriesStatus seriesStatus : watchingSeries) {
-                Series series = seriesStatus.getSeries();
-                List<Episode> episodes = series.getEpisodes();
-                for (Episode episode : episodes) {
-                    UserEpisodeStatus episodeStatus = episodeStatusRepository.findByUserAndEpisode(user, episode);
-                    if (episodeStatus != null && episodeStatus.getWatchStatus() == WatchStatus.WATCHED) {
-                        totalSeriesDuration += episode.getDuration();
-                    }
-                }
-
-                if (seriesStatus.getWatchStatus() == WatchStatus.WATCHED) {
                     watchedSeriesCount++;
                     completedSeriesCount++;
                 }
+
+                for (UserSeriesStatus seriesStatus : watchingSeries) {
+                    Series series = seriesStatus.getSeries();
+                    List<Episode> episodes = series.getEpisodes();
+                    for (Episode episode : episodes) {
+                        UserEpisodeStatus episodeStatus = episodeStatusRepository.findByUserAndEpisode(user, episode);
+                        if (episodeStatus != null && episodeStatus.getWatchStatus() == WatchStatus.WATCHED) {
+                            totalSeriesDuration += episode.getDuration();
+                        }
+                    }
+
+                    if (seriesStatus.getWatchStatus() == WatchStatus.WATCHED) {
+                        watchedSeriesCount++;
+                        completedSeriesCount++;
+                    }
+                }
             }
 
-            for (UserMovieStatus movieStatus : watchedMovies) {
-                Movie movie = movieStatus.getMovie();
-                totalMovieDuration += movie.getDuration();
+            if (!watchedMovies.isEmpty()) {
+                for (UserMovieStatus movieStatus : watchedMovies) {
+                    Movie movie = movieStatus.getMovie();
+                    totalMovieDuration += movie.getDuration();
 
-                movieGenresCount.put(movie.getGenre(), movieGenresCount.getOrDefault(movie.getGenre(), 0) + 1);
+                    movieGenresCount.put(movie.getGenre(), movieGenresCount.getOrDefault(movie.getGenre(), 0) + 1);
 
-                completedMoviesCount++;
+                    completedMoviesCount++;
+                }
             }
 
-            String mostWatchedMovieGenre = Collections.max(movieGenresCount.entrySet(), Map.Entry.comparingByValue()).getKey();
-            String mostWatchedSeriesGenre = Collections.max(seriesGenresCount.entrySet(), Map.Entry.comparingByValue()).getKey();
+            String mostWatchedMovieGenre = !movieGenresCount.isEmpty() ? Collections.max(movieGenresCount.entrySet(), Map.Entry.comparingByValue()).getKey() : "";
+            String mostWatchedSeriesGenre = !seriesGenresCount.isEmpty() ? Collections.max(seriesGenresCount.entrySet(), Map.Entry.comparingByValue()).getKey() : "";
 
             long movieHours = TimeUnit.MINUTES.toHours(totalMovieDuration);
             long movieMinutes = totalMovieDuration - TimeUnit.HOURS.toMinutes(movieHours);
@@ -153,12 +157,21 @@ public class UserService {
             statistics.put("totalSeriesDuration", totalSeriesDurationFormatted);
             statistics.put("mostWatchedMovieGenre", mostWatchedMovieGenre);
             statistics.put("mostWatchedSeriesGenre", mostWatchedSeriesGenre);
-            statistics.put("completedSeriesPercent", (double) completedSeriesCount / totalSeriesInDiary * 100);
-            statistics.put("completedMoviesPercent", (double) completedMoviesCount / totalMoviesInDiary * 100);
+            statistics.put("completedSeriesPercent", totalSeriesInDiary != 0 ? (double) completedSeriesCount / totalSeriesInDiary * 100 : 0);
+            statistics.put("completedMoviesPercent", totalMoviesInDiary != 0 ? (double) completedMoviesCount / totalMoviesInDiary * 100 : 0);
 
             return statistics;
         }
 
-        return null;
+        Map<String, Object> statistics = new HashMap<>();
+        statistics.put("watchedMoviesCount", 0);
+        statistics.put("watchedSeriesCount", 0);
+        statistics.put("totalMovieDuration", "00:00");
+        statistics.put("totalSeriesDuration", "00:00");
+        statistics.put("mostWatchedMovieGenre", "");
+        statistics.put("mostWatchedSeriesGenre", "");
+        statistics.put("completedSeriesPercent", 0);
+        statistics.put("completedMoviesPercent", 0);
+        return statistics;
     }
 }

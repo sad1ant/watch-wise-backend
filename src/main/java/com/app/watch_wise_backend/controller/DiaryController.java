@@ -106,10 +106,12 @@ public class DiaryController {
     }
 
     @GetMapping("/movie-diary")
-    public ResponseEntity<?> getMovieDiary(@RequestHeader("Authorization") String authHeader) {
-        String token = authHeader.substring(7);
-        Claims claims = authService.validateAccessToken(token);
-        String username = (String) claims.get("username");
+    public ResponseEntity<?> getMovieDiary(@RequestParam(value = "username", defaultValue = "") String username, @RequestHeader("Authorization") String authHeader) {
+        if (username.isEmpty()) {
+            String token = authHeader.substring(7);
+            Claims claims = authService.validateAccessToken(token);
+            username = (String) claims.get("username");
+        }
 
         Map<String, Object> response = diaryService.getMovieDiary(username);
         if (response != null) {
@@ -120,10 +122,12 @@ public class DiaryController {
     }
 
     @GetMapping("/series-diary")
-    public ResponseEntity<?> getSeriesDiary(@RequestHeader("Authorization") String authHeader) {
-        String token = authHeader.substring(7);
-        Claims claims = authService.validateAccessToken(token);
-        String username = (String) claims.get("username");
+    public ResponseEntity<?> getSeriesDiary(@RequestParam(value = "username", defaultValue = "") String username, @RequestHeader("Authorization") String authHeader) {
+        if (username.isEmpty()) {
+            String token = authHeader.substring(7);
+            Claims claims = authService.validateAccessToken(token);
+            username = (String) claims.get("username");
+        }
 
         Map<String, Object> response = diaryService.getSeriesDiary(username);
         if (response != null) {

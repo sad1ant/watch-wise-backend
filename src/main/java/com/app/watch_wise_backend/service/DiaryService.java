@@ -1,12 +1,8 @@
 package com.app.watch_wise_backend.service;
 
-import com.app.watch_wise_backend.model.content.Movie;
-import com.app.watch_wise_backend.model.content.Series;
-import com.app.watch_wise_backend.model.content.UserMovieStatus;
+import com.app.watch_wise_backend.model.content.*;
 import com.app.watch_wise_backend.model.diary.UserMovieDiary;
 import com.app.watch_wise_backend.model.diary.UserSeriesDiary;
-import com.app.watch_wise_backend.model.review.Review;
-import com.app.watch_wise_backend.model.review.ReviewStatus;
 import com.app.watch_wise_backend.model.user.User;
 import com.app.watch_wise_backend.repository.*;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -31,6 +27,10 @@ public class DiaryService {
     private UserSeriesRepository userSeriesRepository;
     @Autowired
     private SeriesRepository seriesRepository;
+    @Autowired
+    private UserMovieStatusRepository movieStatusRepository;
+    @Autowired
+    private UserSeriesStatusRepository seriesStatusRepository;
 
     public Map<String, String> addMovieToDiary(String username, Long movieId) {
         User user = userRepository.findByUsername(username);
@@ -189,6 +189,15 @@ public class DiaryService {
                     diaryEntry.put("releaseYear", entry.getMovie().getReleaseYear());
                     diaryEntry.put("image", entry.getMovie().getImage());
                     diaryEntry.put("dateAdded", entry.getDateAdded());
+
+                    List<UserMovieStatus> statuses = movieStatusRepository.findAllByUserAndMovie(user, entry.getMovie());
+                    if (statuses != null && !statuses.isEmpty()) {
+                        List<String> statusStrings = statuses.stream().map(status -> status.getWatchStatus().toString()).collect(Collectors.toList());
+                        diaryEntry.put("statuses", statusStrings);
+                    } else {
+                        diaryEntry.put("statuses", "");
+                    }
+
                     return diaryEntry;
                 })
                 .collect(Collectors.toList());
@@ -215,6 +224,15 @@ public class DiaryService {
                     diaryEntry.put("releaseYear", entry.getSeries().getReleaseYear());
                     diaryEntry.put("genre", entry.getSeries().getGenre());
                     diaryEntry.put("image", entry.getSeries().getImage());
+
+                    List<UserSeriesStatus> statuses = seriesStatusRepository.findAllByUserAndSeries(user, entry.getSeries());
+                    if (statuses != null && !statuses.isEmpty()) {
+                        List<String> statusStrings = statuses.stream().map(status -> status.getWatchStatus().toString()).collect(Collectors.toList());
+                        diaryEntry.put("statuses", statusStrings);
+                    } else {
+                        diaryEntry.put("statuses", "");
+                    }
+
                     return diaryEntry;
                 })
                 .collect(Collectors.toList());
