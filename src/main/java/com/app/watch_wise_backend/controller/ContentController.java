@@ -14,6 +14,7 @@ import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
 
 import java.util.Collections;
+import java.util.List;
 import java.util.Map;
 
 @RestController
@@ -117,5 +118,65 @@ public class ContentController {
         String title = request.get("title");
         Page<SeriesDTO> result = contentService.searchSeriesByTitle(title, page, size);
         return new ResponseEntity<>(result, HttpStatus.OK);
+    }
+
+    @GetMapping("/movies-recommendations")
+    public ResponseEntity<List<MovieDTO>> getPersonalizedMovieRecommendations(@RequestHeader("Authorization") String authHeader) {
+        String username = null;
+        if (authHeader != null && !authHeader.isEmpty()) {
+            String token = authHeader.substring(7);
+            Claims claims = authService.validateAccessToken(token);
+            if (claims != null) {
+                username = (String) claims.get("username");
+            }
+        }
+
+        List<MovieDTO> recommendations = contentService.getPersonalizedMovieRecommendations(username);
+        return new ResponseEntity<>(recommendations, HttpStatus.OK);
+    }
+
+    @GetMapping("/series-recommendations")
+    public ResponseEntity<List<SeriesDTO>> getPersonalizedSeriesRecommendations(@RequestHeader("Authorization") String authHeader) {
+        String username = null;
+        if (authHeader != null && !authHeader.isEmpty()) {
+            String token = authHeader.substring(7);
+            Claims claims = authService.validateAccessToken(token);
+            if (claims != null) {
+                username = (String) claims.get("username");
+            }
+        }
+
+        List<SeriesDTO> recommendations = contentService.getPersonalizedSeriesRecommendations(username);
+        return new ResponseEntity<>(recommendations, HttpStatus.OK);
+    }
+
+    @GetMapping("/movies-interested")
+    public ResponseEntity<List<MovieDTO>> getInterestedMovies(@RequestHeader("Authorization") String authHeader) {
+        String username = null;
+        if (authHeader != null && !authHeader.isEmpty()) {
+            String token = authHeader.substring(7);
+            Claims claims = authService.validateAccessToken(token);
+            if (claims != null) {
+                username = (String) claims.get("username");
+            }
+        }
+
+        List<MovieDTO> recommendations = contentService.getInterestedMovie(username);
+        return new ResponseEntity<>(recommendations, HttpStatus.OK);
+    }
+
+    @GetMapping("/series-interested")
+    public ResponseEntity<List<SeriesDTO>> getInterestedSeries(@RequestHeader("Authorization") String authHeader) {
+        String username = null;
+        if (authHeader != null && !authHeader.isEmpty()) {
+            String token = authHeader.substring(7);
+            Claims claims = authService.validateAccessToken(token);
+            if (claims != null) {
+                username = (String) claims.get("username");
+            }
+        }
+
+        List<SeriesDTO> recommendations = contentService.getInterestedSeries(username);
+        return new ResponseEntity<>(recommendations, HttpStatus.OK);
     }
 }

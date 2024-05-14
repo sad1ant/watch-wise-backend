@@ -7,8 +7,10 @@ import org.springframework.data.jpa.domain.Specification;
 import org.springframework.data.jpa.repository.JpaRepository;
 import org.springframework.stereotype.Repository;
 
+import java.util.List;
+
 @Repository
 public interface SeriesRepository extends JpaRepository<Series, Long> {
     Page<Series> findAll(Specification<Series> spec, Pageable pageable);
-
+    List<Series> findAll(Specification<Series> spec);
 }

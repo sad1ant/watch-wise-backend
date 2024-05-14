@@ -7,7 +7,10 @@ import org.springframework.data.jpa.domain.Specification;
 import org.springframework.data.jpa.repository.JpaRepository;
 import org.springframework.stereotype.Repository;
 
+import java.util.List;
+
 @Repository
 public interface MovieRepository extends JpaRepository<Movie, Long> {
     Page<Movie> findAll(Specification<Movie> spec, Pageable pageable);
+    List<Movie> findAll(Specification<Movie> spec);
 }

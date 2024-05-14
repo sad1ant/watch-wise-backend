@@ -8,7 +8,6 @@ import com.app.watch_wise_backend.model.review.Review;
 import com.app.watch_wise_backend.model.review.ReviewStatus;
 import com.app.watch_wise_backend.model.user.User;
 import com.app.watch_wise_backend.repository.*;
-import jakarta.persistence.criteria.Subquery;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.data.domain.Page;
 import org.springframework.data.domain.PageRequest;
@@ -16,10 +15,7 @@ import org.springframework.data.domain.Pageable;
 import org.springframework.data.jpa.domain.Specification;
 import org.springframework.stereotype.Service;
 
-import java.util.ArrayList;
-import java.util.HashMap;
-import java.util.List;
-import java.util.Map;
+import java.util.*;
 import java.util.stream.Collectors;
 
 @Service
@@ -311,5 +307,125 @@ public class ContentService {
                 s.getRating(),
                 s.getImage()
         ));
+    }
+
+    public List<MovieDTO> getPersonalizedMovieRecommendations(String username) {
+        User user = userRepository.findByUsername(username);
+        if (user != null) {
+            List<UserMovieStatus> recommendedMovies = movieStatusRepository.findByUserAndWatchStatus(user, WatchStatus.RECOMMENDED);
+
+            if (!recommendedMovies.isEmpty()) {
+                Set<String> genres = recommendedMovies.stream()
+                        .map(userMovieStatus -> userMovieStatus.getMovie().getGenre())
+                        .collect(Collectors.toSet());
+
+                Specification<Movie> spec = Specification.where((root, query, cb) -> root.get("genre").in(genres));
+                List<Movie> personalizedRecommendations = movieRepository.findAll(spec);
+
+                return personalizedRecommendations.stream()
+                        .limit(5)
+                        .map(movie -> new MovieDTO(
+                                movie.getId(),
+                                movie.getTitle(),
+                                movie.getGenre(),
+                                movie.getReleaseYear(),
+                                movie.getRating(),
+                                movie.getImage()
+                        ))
+                        .collect(Collectors.toList());
+            }
+        }
+
+        return new ArrayList<>();
+    }
+
+    public List<SeriesDTO> getPersonalizedSeriesRecommendations(String username) {
+        User user = userRepository.findByUsername(username);
+        if (user != null) {
+            List<UserSeriesStatus> recommendedSeries = seriesStatusRepository.findByUserAndWatchStatus(user, WatchStatus.RECOMMENDED);
+
+            if (!recommendedSeries.isEmpty()) {
+                Set<String> genres = recommendedSeries.stream()
+                        .map(userSeriesStatus -> userSeriesStatus.getSeries().getGenre())
+                        .collect(Collectors.toSet());
+
+                Specification<Series> spec = Specification.where((root, query, cb) -> root.get("genre").in(genres));
+                List<Series> personalizedRecommendations = seriesRepository.findAll(spec);
+
+                return personalizedRecommendations.stream()
+                        .limit(5)
+                        .map(s -> new SeriesDTO(
+                                s.getId(),
+                                s.getTitle(),
+                                s.getGenre(),
+                                s.getReleaseYear(),
+                                s.getRating(),
+                                s.getImage()
+                        ))
+                        .collect(Collectors.toList());
+            }
+        }
+
+        return new ArrayList<>();
+    }
+
+    public List<MovieDTO> getInterestedMovie(String username) {
+        User user = userRepository.findByUsername(username);
+        if (user != null) {
+            List<UserMovieStatus> interestedMovies = movieStatusRepository.findByUserAndWatchStatus(user, WatchStatus.INTERESTED);
+
+            if (!interestedMovies.isEmpty()) {
+                Set<String> genres = interestedMovies.stream()
+                        .map(userMovieStatus -> userMovieStatus.getMovie().getGenre())
+                        .collect(Collectors.toSet());
+
+                Specification<Movie> spec = Specification.where((root, query, cb) -> root.get("genre").in(genres));
+                List<Movie> interestedMovie = movieRepository.findAll(spec);
+
+                return interestedMovie.stream()
+                        .limit(5)
+                        .map(movie -> new MovieDTO(
+                                movie.getId(),
+                                movie.getTitle(),
+                                movie.getGenre(),
+                                movie.getReleaseYear(),
+                                movie.getRating(),
+                                movie.getImage()
+                        ))
+                        .collect(Collectors.toList());
+            }
+        }
+
+        return new ArrayList<>();
+    }
+
+    public List<SeriesDTO> getInterestedSeries(String username) {
+        User user = userRepository.findByUsername(username);
+        if (user != null) {
+            List<UserSeriesStatus> interestedSeries = seriesStatusRepository.findByUserAndWatchStatus(user, WatchStatus.INTERESTED);
+
+            if (!interestedSeries.isEmpty()) {
+                Set<String> genres = interestedSeries.stream()
+                        .map(userSeriesStatus -> userSeriesStatus.getSeries().getGenre())
+                        .collect(Collectors.toSet());
+
+                Specification<Series> spec = Specification.where((root, query, cb) -> root.get("genre").in(genres));
+                List<Series> interestedS = seriesRepository.findAll(spec);
+
+                return interestedS.stream()
+                        .limit(5)
+                        .map(s -> new SeriesDTO(
+                                s.getId(),
+                                s.getTitle(),
+                                s.getGenre(),
+                                s.getReleaseYear(),
+                                s.getRating(),
+                                s.getImage()
+                        ))
+                        .collect(Collectors.toList());
+            }
+        }
+
+        return new ArrayList<>();
     }
 }
