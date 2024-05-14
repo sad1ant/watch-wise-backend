@@ -1,5 +1,6 @@
 package com.app.watch_wise_backend.controller;
 
+import com.app.watch_wise_backend.model.review.Review;
 import com.app.watch_wise_backend.service.AuthService;
 import com.app.watch_wise_backend.service.UserService;
 import io.jsonwebtoken.Claims;
@@ -9,6 +10,7 @@ import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
 
 import java.util.Collections;
+import java.util.List;
 import java.util.Map;
 
 @RestController
@@ -45,5 +47,17 @@ public class UserController {
         } else {
             return new ResponseEntity<>(Collections.singletonMap("message", "error"), HttpStatus.BAD_REQUEST);
         }
+    }
+
+    @GetMapping("/profile/reviews")
+    public ResponseEntity<?> getUserReviews(@RequestParam(value = "username", defaultValue = "") String username, @RequestHeader("Authorization") String authHeader) {
+        if (username.isEmpty()) {
+            String token = authHeader.substring(7);
+            Claims claims = authService.validateAccessToken(token);
+            username = (String) claims.get("username");
+        }
+
+        Map<String, Object> reviews = userService.getUserReviews(username);
+        return new ResponseEntity<>(reviews, HttpStatus.OK);
     }
 }
