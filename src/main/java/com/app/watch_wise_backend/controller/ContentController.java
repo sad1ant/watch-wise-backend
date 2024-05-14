@@ -22,8 +22,6 @@ public class ContentController {
     @Autowired
     private ContentService contentService;
     @Autowired
-    private UserService userService;
-    @Autowired
     private AuthService authService;
 
     @GetMapping("/movies")
@@ -178,5 +176,27 @@ public class ContentController {
 
         List<SeriesDTO> recommendations = contentService.getInterestedSeries(username);
         return new ResponseEntity<>(recommendations, HttpStatus.OK);
+    }
+
+    @PostMapping("/auth/rate-movie/{movieId}")
+    @ResponseStatus(HttpStatus.OK)
+    public void rateMovie(@RequestHeader("Authorization") String authHeader, @RequestBody Map<String, Integer> request, @PathVariable("movieId") Long movieId) {
+        String token = authHeader.substring(7);
+        Claims claims = authService.validateAccessToken(token);
+        String username = (String) claims.get("username");
+        int rating = request.get("rating");
+
+        contentService.rateMovie(movieId, rating, username);
+    }
+
+    @PostMapping("/auth/rate-series/{seriesId}")
+    @ResponseStatus(HttpStatus.OK)
+    public void rateSeries(@RequestHeader("Authorization") String authHeader, @RequestBody Map<String, Integer> request, @PathVariable("seriesId") Long seriesId) {
+        String token = authHeader.substring(7);
+        Claims claims = authService.validateAccessToken(token);
+        String username = (String) claims.get("username");
+        int rating = request.get("rating");
+
+        contentService.rateSeries(seriesId, rating, username);
     }
 }

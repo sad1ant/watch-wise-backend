@@ -3,6 +3,7 @@ package com.app.watch_wise_backend.service;
 import com.app.watch_wise_backend.model.content.*;
 import com.app.watch_wise_backend.model.diary.UserMovieDiary;
 import com.app.watch_wise_backend.model.diary.UserSeriesDiary;
+import com.app.watch_wise_backend.model.review.Review;
 import com.app.watch_wise_backend.model.user.Role;
 import com.app.watch_wise_backend.model.user.User;
 import com.app.watch_wise_backend.repository.*;
@@ -11,10 +12,7 @@ import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.security.crypto.password.PasswordEncoder;
 import org.springframework.stereotype.Service;
 
-import java.util.Collections;
-import java.util.HashMap;
-import java.util.List;
-import java.util.Map;
+import java.util.*;
 import java.util.concurrent.TimeUnit;
 
 @Service
@@ -35,6 +33,12 @@ public class UserService {
     private UserMovieRepository movieDiaryRepository;
     @Autowired
     private UserSeriesRepository seriesDiaryRepository;
+    @Autowired
+    private ReviewRepository reviewRepository;
+    @Autowired
+    private MovieRepository movieRepository;
+    @Autowired
+    private SeriesRepository seriesRepository;
 
     public User registerUser(String username, String email, String password, String fullName) {
         User user = new User();
@@ -173,5 +177,45 @@ public class UserService {
         statistics.put("completedSeriesPercent", 0);
         statistics.put("completedMoviesPercent", 0);
         return statistics;
+    }
+
+    public Map<String, Object> getUserReviews(String username) {
+        User user = userRepository.findByUsername(username);
+        if (user != null) {
+            List<Review> reviews = reviewRepository.findByUser(user);
+            if (reviews != null && !reviews.isEmpty()) {
+                List<Map<String, Object>> reviewList = new ArrayList<>();
+                for (Review review : reviews) {
+                    Map<String, Object> reviewData = new HashMap<>();
+                    reviewData.put("id", review.getId());
+                    reviewData.put("description", review.getDescription());
+                    reviewData.put("status", review.getStatus());
+                    reviewData.put("reasonDeletion", review.getReasonDeletion());
+
+                    String contentTitle = "";
+                    if (review.getMovie() != null) {
+                        Movie movie = movieRepository.findById(review.getMovie().getId()).orElse(null);
+                        if (movie != null) {
+                            contentTitle = movie.getTitle();
+                        }
+                    } else if (review.getSeries() != null) {
+                        Series series = seriesRepository.findById(review.getSeries().getId()).orElse(null);
+                        if (series != null) {
+                            contentTitle = series.getTitle();
+                        }
+                    }
+                    reviewData.put("contentTitle", contentTitle);
+
+                    reviewList.add(reviewData);
+                }
+                Map<String, Object> response = new HashMap<>();
+                response.put("reviews", reviewList);
+                return response;
+            } else {
+                return null;
+            }
+        } else {
+            return null;
+        }
     }
 }

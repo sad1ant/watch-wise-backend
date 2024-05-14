@@ -36,6 +36,8 @@ public class ContentService {
     private UserSeriesStatusRepository seriesStatusRepository;
     @Autowired
     private UserEpisodeStatusRepository episodeStatusRepository;
+    @Autowired
+    private UserRatingRepository userRatingRepository;
 
     public Page<MovieDTO> getAllMovies(int page, int size) {
         Pageable pageable = PageRequest.of(page, size);
@@ -201,7 +203,6 @@ public class ContentService {
         return null;
     }
 
-    // TODO redo
     public Page<MovieDTO> getFilteredMovies(FilterParams params, int page, int size) {
         Pageable pageable = PageRequest.of(page, size);
         Specification<Movie> spec = Specification.where(null);
@@ -236,7 +237,6 @@ public class ContentService {
         ));
     }
 
-    // TODO redo
     public Page<SeriesDTO> getFilteredSeries(FilterParams params, int page, int size) {
         Pageable pageable = PageRequest.of(page, size);
         Specification<Series> spec = Specification.where(null);
@@ -427,5 +427,105 @@ public class ContentService {
         }
 
         return new ArrayList<>();
+    }
+
+    public void rateMovie(Long movieId, int rating, String username) {
+        try {
+            User user = userRepository.findByUsername(username);
+            Movie movie = movieRepository.findById(movieId).orElse(null);
+            if (user != null && movie != null) {
+                UserRating userRating = userRatingRepository.findByUserAndMovie(user, movie);
+
+                if (rating > 0) {
+                    if (userRating == null) {
+                        userRating = new UserRating();
+                        userRating.setUser(user);
+                        userRating.setMovie(movie);
+                    }
+                    userRating.setRating(rating);
+                    userRatingRepository.save(userRating);
+                } else {
+                    if (userRating != null) {
+                        userRatingRepository.delete(userRating);
+                    }
+                }
+
+                double averageRating = movie.getUserRatings().stream()
+                        .filter(r -> r.getRating() > 0)
+                        .mapToDouble(UserRating::getRating)
+                        .average()
+                        .orElse(0.0);
+                movie.setRating(averageRating);
+
+                UserMovieStatus userMovieStatus = movieStatusRepository.findByUserAndMovieAndWatchStatus(user, movie, WatchStatus.RATED);
+                if (rating > 0) {
+                    if (userMovieStatus == null) {
+                        userMovieStatus = new UserMovieStatus();
+                        userMovieStatus.setUser(user);
+                        userMovieStatus.setMovie(movie);
+                    }
+                    userMovieStatus.setWatchStatus(WatchStatus.RATED);
+                    movieStatusRepository.save(userMovieStatus);
+                } else if (rating == 0) {
+                    if (userMovieStatus != null) {
+                        movieStatusRepository.delete(userMovieStatus);
+                    }
+                }
+
+                movieRepository.save(movie);
+            }
+        } catch (Exception e) {
+            e.printStackTrace();
+        }
+    }
+
+    public void rateSeries(Long seriesId, int rating, String username) {
+        try {
+            User user = userRepository.findByUsername(username);
+            Series series = seriesRepository.findById(seriesId).orElse(null);
+            if (user != null && series != null) {
+                UserRating userRating = userRatingRepository.findByUserAndSeries(user, series);
+
+                if (rating > 0) {
+                    if (userRating == null) {
+                        userRating = new UserRating();
+                        userRating.setUser(user);
+                        userRating.setSeries(series);
+                    }
+                    userRating.setRating(rating);
+                    userRatingRepository.save(userRating);
+                } else {
+                    if (userRating != null) {
+                        userRatingRepository.delete(userRating);
+                    }
+                }
+
+                double averageRating = series.getUserRatings().stream()
+                        .filter(r -> r.getRating() > 0)
+                        .mapToDouble(UserRating::getRating)
+                        .average()
+                        .orElse(0.0);
+                series.setRating(averageRating);
+
+                UserSeriesStatus userSeriesStatus = seriesStatusRepository.findByUserAndSeriesAndWatchStatus(user, series, WatchStatus.RATED);
+                if (rating > 0) {
+                    if (userSeriesStatus == null) {
+                        userSeriesStatus = new UserSeriesStatus();
+                        userSeriesStatus.setUser(user);
+                        userSeriesStatus.setSeries(series);
+                    }
+                    userSeriesStatus.setWatchStatus(WatchStatus.RATED);
+                    seriesStatusRepository.save(userSeriesStatus);
+                } else if (rating == 0) {
+                    if (userSeriesStatus != null) {
+                        seriesStatusRepository.delete(userSeriesStatus);
+                    }
+                }
+
+                seriesRepository.save(series);
+            }
+        } catch (Exception e) {
+            e.printStackTrace();
+        }
     }
 }

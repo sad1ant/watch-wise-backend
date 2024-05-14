@@ -2,6 +2,7 @@ package com.app.watch_wise_backend.model.content;
 
 import com.app.watch_wise_backend.model.diary.UserSeriesDiary;
 import com.app.watch_wise_backend.model.review.Review;
+import com.app.watch_wise_backend.model.user.User;
 import jakarta.persistence.*;
 import lombok.*;
 
@@ -78,4 +79,7 @@ public class Series {
 
     @OneToMany(mappedBy = "series")
     private List<Review> review;
+
+    @OneToMany(mappedBy = "series")
+    private List<UserRating> userRatings;
 }

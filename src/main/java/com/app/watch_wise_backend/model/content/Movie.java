@@ -2,6 +2,7 @@ package com.app.watch_wise_backend.model.content;
 
 import com.app.watch_wise_backend.model.diary.UserMovieDiary;
 import com.app.watch_wise_backend.model.review.Review;
+import com.app.watch_wise_backend.model.user.User;
 import jakarta.persistence.*;
 import lombok.*;
 
@@ -69,11 +70,6 @@ public class Movie {
     @Column(name = "image", nullable = false)
     private String image;
 
-    @ElementCollection
-    @CollectionTable(name = "movie_ratings", joinColumns = @JoinColumn(name = "movie_id"))
-    @Column(name = "rating")
-    private List<Integer> ratings;
-
     @OneToMany(mappedBy = "movie")
     private List<UserMovieStatus> movieStatuses;
 
@@ -82,4 +78,7 @@ public class Movie {
 
     @OneToMany(mappedBy = "movie")
     private List<Review> review;
+
+    @OneToMany(mappedBy = "movie")
+    private List<UserRating> userRatings;
 }
