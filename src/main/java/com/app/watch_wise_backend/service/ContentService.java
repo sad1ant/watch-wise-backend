@@ -83,7 +83,7 @@ public class ContentService {
             map.put("cinematographers", movie.getCinematographers());
             map.put("producers", movie.getProducers());
             map.put("composers", movie.getComposers());
-            map.put("editors", movie.getEditors());
+            map.put("actors", movie.getActors());
             map.put("artists", movie.getArtists());
             map.put("budget", movie.getBudget());
             map.put("age_rating", movie.getAgeRating());
@@ -137,7 +137,7 @@ public class ContentService {
             map.put("cinematographers", series.getCinematographers());
             map.put("producers", series.getProducers());
             map.put("composers", series.getComposers());
-            map.put("editors", series.getEditors());
+            map.put("actors", series.getActors());
             map.put("artists", series.getArtists());
             map.put("budget", series.getBudget());
             map.put("age_rating", series.getAgeRating());

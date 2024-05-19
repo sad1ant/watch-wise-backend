@@ -53,8 +53,8 @@ public class Series {
     @Column(name = "artists", nullable = false)
     private String artists;
 
-    @Column(name = "editors", nullable = false)
-    private String editors;
+    @Column(name = "actors", nullable = false)
+    private String actors;
 
     @Column(name = "budget", nullable = false)
     private Double budget;

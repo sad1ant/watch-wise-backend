@@ -12,6 +12,7 @@ import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
 
 import java.util.Collections;
+import java.util.HashMap;
 import java.util.Map;
 
 @RestController
@@ -31,7 +32,7 @@ public class AuthController {
 
     @PostMapping("/login")
     public ResponseEntity<?> login(@RequestBody User request, HttpServletResponse response) {
-        Map<String, String> responseMap = userService.loginUser(request.getUsername(), request.getPassword(), response);
+        Map<String, Object> responseMap = userService.loginUser(request.getUsername(), request.getPassword(), response);
         return new ResponseEntity<>(responseMap, HttpStatus.OK);
     }
 
@@ -49,8 +50,22 @@ public class AuthController {
         String username = (String) claims.get("username");
         User user = userRepository.findByUsername(username);
 
+        if (user == null) {
+            return new ResponseEntity<>(Collections.singletonMap("message", "User not found"), HttpStatus.UNAUTHORIZED);
+        }
+
         Map<String, String> tokens = authService.generateTokensAndSetCookies(user, response);
-        return new ResponseEntity<>(tokens, HttpStatus.OK);
+        Map<String, Object> userBody = new HashMap<>();
+        userBody.put("id", user.getId());
+        userBody.put("username", username);
+        userBody.put("fullName", user.getFullName());
+        userBody.put("email", user.getEmail());
+        userBody.put("role", user.getRole());
+
+        Map<String, Object> responseBody = new HashMap<>();
+        responseBody.put("user", userBody);
+        responseBody.put("tokens", tokens);
+        return new ResponseEntity<>(responseBody, HttpStatus.OK);
     }
 
     @PostMapping("/auth/logout")

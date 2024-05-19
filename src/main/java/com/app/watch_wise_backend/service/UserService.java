@@ -50,10 +50,22 @@ public class UserService {
         return userRepository.save(user);
     }
 
-    public Map<String, String> loginUser(String username, String password, HttpServletResponse response) {
+    public Map<String, Object> loginUser(String username, String password, HttpServletResponse response) {
         User user = userRepository.findByUsername(username);
         if (user != null && passwordEncoder.matches(password, user.getPassword())) {
-            return authService.generateTokensAndSetCookies(user, response);
+            Map<String, String> tokens = authService.generateTokensAndSetCookies(user, response);
+
+            Map<String, Object> result = new HashMap<>();
+            result.putAll(tokens);
+            Map<String, Object> userBody = new HashMap<>();
+            userBody.put("id", user.getId());
+            userBody.put("username", user.getUsername());
+            userBody.put("fullName", user.getFullName());
+            userBody.put("email", user.getEmail());
+            userBody.put("role", user.getRole());
+            result.put("user", userBody);
+
+            return result;
         } else {
             return Collections.singletonMap("error", "Invalid credentials");
         }

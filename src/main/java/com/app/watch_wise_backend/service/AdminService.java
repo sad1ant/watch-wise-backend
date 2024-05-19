@@ -99,7 +99,7 @@ public class AdminService {
             existingMovie.setCinematographers(updatedMovie.getCinematographers());
             existingMovie.setComposers(updatedMovie.getComposers());
             existingMovie.setArtists(updatedMovie.getArtists());
-            existingMovie.setEditors(updatedMovie.getEditors());
+            existingMovie.setActors(updatedMovie.getActors());
             existingMovie.setBudget(updatedMovie.getBudget());
             existingMovie.setAgeRating(updatedMovie.getAgeRating());
             existingMovie.setDuration(updatedMovie.getDuration());
@@ -125,7 +125,7 @@ public class AdminService {
             existingSeries.setCinematographers(updatedSeries.getCinematographers());
             existingSeries.setComposers(updatedSeries.getComposers());
             existingSeries.setArtists(updatedSeries.getArtists());
-            existingSeries.setEditors(updatedSeries.getEditors());
+            existingSeries.setActors(updatedSeries.getActors());
             existingSeries.setBudget(updatedSeries.getBudget());
             existingSeries.setAgeRating(updatedSeries.getAgeRating());
             existingSeries.setImage(updatedSeries.getImage());
